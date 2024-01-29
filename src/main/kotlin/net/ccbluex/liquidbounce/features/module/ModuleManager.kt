@@ -58,6 +58,7 @@ import net.ccbluex.liquidbounce.features.module.modules.world.crystalAura.Module
 import net.ccbluex.liquidbounce.features.module.modules.world.scaffold.ModuleScaffold
 import net.ccbluex.liquidbounce.script.RequiredByScript
 import org.lwjgl.glfw.GLFW
+import kotlin.reflect.full.*
 
 private val modules = mutableListOf<Module>()
 
@@ -85,191 +86,12 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
     /**
      * Register inbuilt client modules
      */
-    fun registerInbuilt() {
-        val builtin = arrayOf(
-            // Combat
-            ModuleAimbot,
-            ModuleAutoArmor,
-            ModuleAutoBow,
-            ModuleAutoClicker,
-            ModuleAutoGapple,
-            ModuleAutoLeave,
-            ModuleAutoPot,
-            ModuleAutoSoup,
-            ModuleAutoHead,
-            ModuleAutoWeapon,
-            ModuleFakeLag,
-            ModuleCriticals,
-            ModuleHitbox,
-            ModuleKillAura,
-            ModuleSuperKnockback,
-            ModuleTimerRange,
-            ModuleVelocity,
-            ModuleBacktrack,
-            ModuleSwordBlock,
-            ModuleAutoBalls,
-
-            // Exploit
-            ModuleAbortBreaking,
-            ModuleAntiReducedDebugInfo,
-            ModuleAntiVanish,
-            ModuleClip,
-            ModuleDamage,
-            ModuleDisabler,
-            ModuleForceUnicodeChat,
-            ModuleGhostHand,
-            ModuleKick,
-            ModuleMoreCarry,
-            ModuleNameCollector,
-            ModuleNoPitchLimit,
-            ModulePingSpoof,
-            ModulePlugins,
-            ModulePortalMenu,
-            ModuleResourceSpoof,
-            ModuleSleepWalker,
-            ModuleSpoofer,
-            ModuleVehicleOneHit,
-            ModuleServerCrasher,
-            ModuleSwingFix,
-
-            // Fun
-            ModuleDankBobbing,
-            ModuleDerp,
-            ModuleSkinDerp,
-            ModuleHandDerp,
-
-            // Misc
-            ModuleAntiBot,
-            ModuleFriendClicker,
-            ModuleKeepChatAfterDeath,
-            ModuleNameProtect,
-            ModuleNotifier,
-            ModuleSpammer,
-            ModuleAutoAccount,
-            ModuleTeams,
-            ModuleAutoChatGame,
-            ModuleDebugRecorder,
-            ModuleFocus,
-            ModuleAntiStaff,
-
-            // Movement
-            ModuleAirJump,
-            ModuleAntiLevitation,
-            ModuleAutoDodge,
-            ModuleAvoidHazards,
-            ModuleBlockBounce,
-            ModuleBlockWalk,
-            ModuleBugUp,
-            ModuleElytraFly,
-            ModuleFly,
-            ModuleFreeze,
-            ModuleHighJump,
-            ModuleInventoryMove,
-            ModuleLiquidWalk,
-            ModuleLongJump,
-            ModuleNoClip,
-            ModuleNoJumpDelay,
-            ModuleNoPush,
-            ModuleNoSlow,
-            ModuleNoWeb,
-            ModuleParkour,
-            ModulePerfectHorseJump,
-            ModuleSafeWalk,
-            ModuleSneak,
-            ModuleSpeed,
-            ModuleSprint,
-            ModuleStep,
-            ModuleReverseStep,
-            ModuleStrafe,
-            ModuleTerrainSpeed,
-            ModuleVehicleControl,
-
-            // Player
-            ModuleAntiAFK,
-            ModuleAntiExploit,
-            ModuleAutoBreak,
-            ModuleAutoFish,
-            ModuleAutoRespawn,
-            ModuleAutoTotem,
-            ModuleAutoWalk,
-            ModuleBlink,
-            ModuleChestStealer,
-            ModuleEagle,
-            ModuleFastUse,
-            ModuleInventoryCleaner,
-            ModuleNoFall,
-            ModuleNoRotateSet,
-            ModuleReach,
-            ModuleRegen,
-            ModuleZoot,
-            ModuleAutoPlay,
-
-            // Render
-            ModuleAnimation,
-            ModuleAntiBlind,
-            ModuleBlockESP,
-            ModuleBreadcrumbs,
-            ModuleCameraClip,
-            ModuleClickGui,
-            ModuleESP,
-            ModuleFreeCam,
-            ModuleFullBright,
-            ModuleHoleESP,
-            ModuleHud,
-            ModuleItemESP,
-            ModuleJumpEffect,
-            ModuleMobOwners,
-            ModuleMurderMystery,
-            ModuleAttackEffects,
-            ModuleNametags,
-            ModuleCombineMobs,
-
-            // ModuleNametags,
-            ModuleNoBob,
-            ModuleNoFov,
-            ModuleNoHurtCam,
-            ModuleNoSignRender,
-            ModuleNoSwing,
-            ModuleOverrideTime,
-            ModuleOverrideWeather,
-            ModuleQuickPerspectiveSwap,
-            ModuleRotations,
-            ModuleStorageESP,
-            ModuleTracers,
-            ModuleTrajectories,
-            ModuleTrueSight,
-            ModuleXRay,
-            ModuleDebug,
-            ModuleMinimap,
-            ModuleScoreboard,
-
-            // World
-            ModuleAutoDisable,
-            ModuleAutoFarm,
-            ModuleAutoTool,
-            ModuleChestAura,
-            ModuleCrystalAura,
-            ModuleFastBreak,
-            ModuleFastPlace,
-            ModuleFucker,
-            ModuleIgnite,
-            ModuleNoSlowBreak,
-            ModuleProjectilePuncher,
-            ModuleScaffold,
-            ModuleTimer,
-            ModuleNuker,
-
-            // Client
-            ModuleAutoConfig,
-            ModuleRichPresence,
-            ModuleCapeTransfer,
-            ModuleHideClient,
-            ModuleEnemies
-        )
-
-        builtin.apply {
-            sortBy { it.name }
-            forEach(::addModule)
+    init {
+        Module::class.nestedClasses.forEach { subclass ->
+            if (subclass.isSubclassOf(Module::class)) {
+                val instance = subclass.createInstance() as Module
+                addModule(instance)
+            }
         }
     }
 
@@ -286,6 +108,7 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
         module.unregister()
         modules -= module
     }
+
 
     /**
      * Allow `ModuleManager += Module` syntax
