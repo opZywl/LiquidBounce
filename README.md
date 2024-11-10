@@ -13,7 +13,7 @@ A free mixin-based injection hacked-client for Minecraft using Minecraft Forge, 
 </div>
 
 ## Notes
-Currently [Legacy](https://github.com/CCBlueX/LiquidBounce/tree/legacy) development is maintained by the community.
+Current [Legacy](https://github.com/CCBlueX/LiquidBounce/tree/legacy) development is maintained by the community.
 
 ## Issues
 If you notice any bugs or missing features, you can let us know by opening an issue [here](https://github.com/CCBlueX/LiquidBounce/issues).
