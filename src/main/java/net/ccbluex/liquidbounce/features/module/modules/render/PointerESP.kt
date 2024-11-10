@@ -195,6 +195,5 @@ object PointerESP : Module("PointerESP", Category.RENDER, hideModule = false) {
         glEnable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
         glDisable(GL_LINE_SMOOTH)
-        glColor4f(1f, 1f, 1f, 1f)
     }
 }
