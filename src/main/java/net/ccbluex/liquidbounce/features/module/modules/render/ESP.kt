@@ -207,8 +207,6 @@ object ESP : Module("ESP", Category.RENDER, hideModule = false) {
         if (mc.theWorld == null || mode != "Glow")
             return
 
-        GlowShader.startDraw(event.partialTicks, glowRenderScale)
-
         renderNameTags = false
 
         try {
@@ -228,8 +226,6 @@ object ESP : Module("ESP", Category.RENDER, hideModule = false) {
         }
 
         renderNameTags = true
-
-        GlowShader.stopDraw(getColor(), glowRadius, glowFade, glowTargetAlpha)
     }
 
     override val tag
