@@ -175,7 +175,7 @@ object Fly : Module("Fly", Category.MOVEMENT, Keyboard.KEY_F, hideModule = false
     ) { fireBallThrowMode == "Edge" && mode == "Fireball" }
 
     val options = RotationSettings(this) { mode == "Fireball" }.apply {
-        resetTicksValue.setSupport { { it && keepRotation } }
+        resetTicksValue.setSupport { it && keepRotation }
     }
 
     val autoJump by boolean("AutoJump", true) { mode == "Fireball" }

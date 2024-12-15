@@ -55,7 +55,7 @@ object BedDefender : Module("BedDefender", Category.WORLD, hideModule = false) {
     private val scannerMode by choices("Scanner", arrayOf("Nearest", "Random"), "Nearest")
 
     private val options = RotationSettings(this).apply {
-        resetTicksValue.setSupport { { it && keepRotationValue.isActive() } }
+        resetTicksValue.setSupport { it && keepRotation }
     }
 
     private val onSneakOnly by boolean("OnSneakOnly", true)
@@ -158,15 +158,16 @@ object BedDefender : Module("BedDefender", Category.WORLD, hideModule = false) {
     }
 
     val onRender3D = handler<Render3DEvent> {
-        if (mark) {
-            val blockPos = blockPosition?.add(0, 1, 0) ?: return@handler
+        if (mark && blockPosition != null) {
+            val blockPos = BlockPos(blockPosition!!.x, blockPosition!!.y + 1, blockPosition!!.z)
             RenderUtils.drawBlockBox(blockPos, Color(68, 117, 255, 100), false)
+            return@handler
         }
     }
 
     private fun addDefenceBlocks(bedPositions: List<BlockPos>) {
         for (bedPos in bedPositions) {
-            val surroundingPositions = arrayOf(
+            val surroundingPositions = listOf(
                 bedPos.up(),
                 bedPos.north(),
                 bedPos.south(),
