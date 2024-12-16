@@ -18,7 +18,8 @@ import net.ccbluex.liquidbounce.utils.client.BlinkUtils
 import net.ccbluex.liquidbounce.utils.client.chat
 import net.ccbluex.liquidbounce.utils.client.schedulePacketProcess
 import net.ccbluex.liquidbounce.utils.extensions.*
-import net.ccbluex.liquidbounce.utils.kotlin.RandomUtils
+import net.ccbluex.liquidbounce.utils.kotlin.RandomUtils.nextFloat
+import net.ccbluex.liquidbounce.utils.kotlin.RandomUtils.nextInt
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawEntityBox
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawPlatform
 import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.searchCenter
@@ -163,7 +164,7 @@ object TimerRange : Module("TimerRange", Category.COMBAT, hideModule = false) {
 
         val targetEntity = event.targetEntity ?: return@handler
         val entityDistance = targetEntity.let { player.getDistanceToEntityBox(it) }
-        val randomTickDelay = RandomUtils.nextInt(minTickDelay.get(), maxTickDelay.get() + 1)
+        val randomTickDelay = nextInt(minTickDelay.get(), maxTickDelay.get() + 1)
         val shouldReturn = Backtrack.runWithNearestTrackedDistance(targetEntity) { !updateDistance(targetEntity) }
 
         if (shouldReturn || (player.isInWeb && !onWeb) || (player.isInLiquid && !onLiquid)) {
@@ -201,7 +202,7 @@ object TimerRange : Module("TimerRange", Category.COMBAT, hideModule = false) {
 
         val nearbyEntity = getNearestEntityInRange() ?: return@handler
 
-        val randomTickDelay = RandomUtils.nextInt(minTickDelay.get(), maxTickDelay.get())
+        val randomTickDelay = nextInt(minTickDelay.get(), maxTickDelay.get())
 
         val shouldReturn = Backtrack.runWithNearestTrackedDistance(nearbyEntity) { !updateDistance(nearbyEntity) }
 
@@ -222,7 +223,7 @@ object TimerRange : Module("TimerRange", Category.COMBAT, hideModule = false) {
 
         if (isPlayerMoving() && !confirmStop) {
             if (isLookingOnEntities(nearbyEntity, maxAngleDifference.toDouble())) {
-                val entityDistance = mc.thePlayer.getDistanceToEntityBox(nearbyEntity)
+                val entityDistance = player.getDistanceToEntityBox(nearbyEntity)
                 if (confirmTick && entityDistance in randomRange..maxRange.get()) {
                     if (updateDistance(nearbyEntity)) {
                         playerTicks = ticksValue
@@ -300,11 +301,11 @@ object TimerRange : Module("TimerRange", Category.COMBAT, hideModule = false) {
      */
     val onUpdate = handler<UpdateEvent> {
         // Randomize the timer & charged delay a bit, to bypass some AntiCheat
-        val timerboost = RandomUtils.nextFloat(minBoostDelay.get(), maxBoostDelay.get())
-        val charged = RandomUtils.nextFloat(minChargedDelay.get(), maxChargedDelay.get())
+        val timerboost = nextFloat(minBoostDelay.get(), maxBoostDelay.get())
+        val charged = nextFloat(minChargedDelay.get(), maxChargedDelay.get())
 
         if (mc.thePlayer != null && mc.theWorld != null) {
-            randomRange = RandomUtils.nextFloat(minRange.get(), maxRange.get())
+            randomRange = nextFloat(minRange.get(), maxRange.get())
         }
 
         if (playerTicks <= 0 || confirmStop) {
@@ -337,10 +338,12 @@ object TimerRange : Module("TimerRange", Category.COMBAT, hideModule = false) {
      * Render event (Mark)
      */
     val onRender3D = handler<Render3DEvent> {
+        val player = mc.thePlayer ?: return@handler
+
         if (timerBoostMode.lowercase() != "modern") return@handler
 
         getNearestEntityInRange()?.let { nearbyEntity ->
-            val entityDistance = mc.thePlayer.getDistanceToEntityBox(nearbyEntity)
+            val entityDistance = player.getDistanceToEntityBox(nearbyEntity)
 
             if (entityDistance > scanRange.get()) return@let
 
@@ -470,7 +473,7 @@ object TimerRange : Module("TimerRange", Category.COMBAT, hideModule = false) {
         }
 
         // Check for knockback
-        if (resetOnKnockback && packet is S12PacketEntityVelocity && mc.thePlayer.entityId == packet.entityID) {
+        if (resetOnKnockback && packet is S12PacketEntityVelocity && mc.thePlayer?.entityId == packet.entityID) {
             shouldResetTimer()
 
             if (shouldReset) {
