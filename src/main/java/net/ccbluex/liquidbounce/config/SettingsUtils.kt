@@ -27,7 +27,7 @@ object SettingsUtils {
      * @param script The script to apply.
      */
     fun applyScript(script: String) {
-        script.lines().forEachIndexed { index, s ->
+        script.lineSequence().forEachIndexed { index, s ->
             if (s.isEmpty() || s.startsWith('#')) {
                 return@forEachIndexed
             }
@@ -185,7 +185,7 @@ object SettingsUtils {
         val all = values && binds && states
 
         return buildString {
-            for (module in moduleManager.modules) {
+            for (module in moduleManager) {
                 if (all || !module.subjective) {
                     if (values) {
                         for (value in module.values) {

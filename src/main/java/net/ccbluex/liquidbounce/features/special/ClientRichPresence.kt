@@ -28,7 +28,7 @@ import org.json.JSONObject
 import java.io.IOException
 import java.time.OffsetDateTime
 
-object ClientRichPresence : MinecraftInstance() {
+object ClientRichPresence : MinecraftInstance {
 
     var showRPCValue = true
     var showRPCServerIP = true
@@ -121,7 +121,7 @@ object ClientRichPresence : MinecraftInstance() {
 
                 // Set modules count info
                 if (showRPCModulesCount) {
-                    setState("Enabled ${moduleManager.modules.count { it.state }} of ${moduleManager.modules.size} modules")
+                    setState("Enabled ${moduleManager.count { it.state }} of ${moduleManager.size} modules")
                 }
             }
         }
