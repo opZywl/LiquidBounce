@@ -200,7 +200,7 @@ class GuiScripts(private val prevGui: GuiScreen) : AbstractScreen() {
                 width / 2f,
                 y + 15f,
                 Color.LIGHT_GRAY.rgb
-            ).coerceAtLeast(x)
+            )
         }
 
         override fun drawBackground() {}
