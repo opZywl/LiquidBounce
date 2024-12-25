@@ -5,7 +5,6 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.misc
 
-import kotlinx.coroutines.NonCancellable.isCancelled
 import net.ccbluex.liquidbounce.LiquidBounce.hud
 import net.ccbluex.liquidbounce.config.choices
 import net.ccbluex.liquidbounce.config.int
