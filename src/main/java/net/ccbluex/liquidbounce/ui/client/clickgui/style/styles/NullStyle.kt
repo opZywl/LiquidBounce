@@ -21,6 +21,7 @@ import net.ccbluex.liquidbounce.utils.extensions.lerpWith
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawBorderedRect
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawRect
 import net.ccbluex.liquidbounce.config.*
+import net.ccbluex.liquidbounce.utils.render.RenderUtils
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.util.StringUtils
 import net.minecraftforge.fml.relauncher.Side
@@ -378,6 +379,143 @@ object NullStyle : Style() {
                             font35.drawString(displayString, minX + 2, yPos + 4, Color.WHITE.rgb)
 
                             yPos += 11
+                        }
+
+                        is ColorValue -> {
+                            val colorValue = value
+
+                            val currentColor = if (colorValue.rainbow) {
+                                colorValue.get()
+                            } else {
+                                colorValue.get()
+                            }
+
+                            val previewSize = 10
+                            val previewX1 = moduleElement.x + moduleElement.width + 4
+                            val previewY1 = yPos + 2
+                            val previewX2 = previewX1 + previewSize
+                            val previewY2 = previewY1 + previewSize
+
+                            drawRect(previewX1, previewY1, previewX2, previewY2, currentColor.rgb)
+
+                            // Abrir/fechar
+                            if (mouseButton == 0 && mouseX in previewX1..previewX2 && mouseY in previewY1..previewY2) {
+                                colorValue.showPicker = !colorValue.showPicker
+                                clickSound()
+                                return true
+                            }
+
+                            if (!colorValue.showPicker) {
+                                yPos += previewSize + 6
+                                return false
+                            }
+
+                            if (!colorValue.rainbow) {
+                                val hsb = Color.RGBtoHSB(currentColor.red, currentColor.green, currentColor.blue, null)
+                                var hue = hsb[0]
+                                var saturation = hsb[1]
+                                var brightness = hsb[2]
+
+                                val colorPickerWidth = 75
+                                val colorPickerHeight = 50
+                                val hueSliderWidth = 7
+                                val hueSliderHeight = 50
+
+                                val startX = previewX1
+                                val startY = previewY1 + previewSize + 4
+                                
+                                drawRect(startX - 2, startY - 12, startX + colorPickerWidth + hueSliderWidth + 10, startY + colorPickerHeight + 2, Int.MIN_VALUE)
+
+                                font35.drawStringWithShadow(
+                                    "Color",
+                                    (startX + 1).toFloat(),
+                                    (startY - 10).toFloat(),
+                                    0xFFFFFFFF.toInt()
+                                )
+
+                                // Quadrado de S/B
+                                for (px in 0 until colorPickerWidth) {
+                                    for (py in 0 until colorPickerHeight) {
+                                        val localS = px / colorPickerWidth.toFloat()
+                                        val localB = 1.0f - (py / colorPickerHeight.toFloat())
+                                        val rgb = Color.HSBtoRGB(hue, localS, localB)
+                                        drawRect(startX + px, startY + py, startX + px + 1, startY + py + 1, rgb)
+                                    }
+                                }
+
+                                // Marcador S/B
+                                val markerX = startX + (saturation * colorPickerWidth).toInt()
+                                val markerY = startY + ((1.0f - brightness) * colorPickerHeight).toInt()
+                                RenderUtils.drawBorderedRectRGB(
+                                    markerX - 2, markerY - 2,
+                                    markerX + 3, markerY + 3,
+                                    1.0f,
+                                    0xFFFFFFFF.toInt(),
+                                    0x00000000
+                                )
+
+                                // Hue
+                                val hueSliderX = startX + colorPickerWidth + 5
+                                val hueSliderY = startY
+                                for (i in 0 until hueSliderHeight) {
+                                    val localHue = i / hueSliderHeight.toFloat()
+                                    val rgb = Color.HSBtoRGB(localHue, 1.0f, 1.0f)
+                                    drawRect(hueSliderX, hueSliderY + i, hueSliderX + hueSliderWidth, hueSliderY + i + 1, rgb)
+                                }
+
+                                val hueMarkerY = hueSliderY + (hue * hueSliderHeight).toInt()
+                                RenderUtils.drawBorderedRectRGB(
+                                    hueSliderX - 1, hueMarkerY - 1,
+                                    hueSliderX + hueSliderWidth + 1, hueMarkerY + 2,
+                                    1.0f,
+                                    0xFFFFFFFF.toInt(),
+                                    0x00000000
+                                )
+
+                                val inColorPicker = mouseX in startX until (startX + colorPickerWidth) && mouseY in startY until (startY + colorPickerHeight)
+                                val inHueSlider = mouseX in hueSliderX..(hueSliderX + hueSliderWidth) && mouseY in hueSliderY..(hueSliderY + hueSliderHeight)
+
+                                if ((mouseButton == 0 || sliderValueHeld == colorValue) && (inColorPicker || inHueSlider)) {
+                                    if (inColorPicker) {
+                                        val newS = ((mouseX - startX) / colorPickerWidth.toFloat()).coerceIn(0f, 1f)
+                                        val newB = (1.0f - ((mouseY - startY) / colorPickerHeight.toFloat())).coerceIn(0f, 1f)
+                                        saturation = newS
+                                        brightness = newB
+                                    }
+                                    if (inHueSlider) {
+                                        val newH = ((mouseY - hueSliderY) / hueSliderHeight.toFloat()).coerceIn(0f, 1f)
+                                        hue = newH
+                                    }
+
+                                    sliderValueHeld = colorValue
+
+                                    if (mouseButton == 0) {
+                                        return true
+                                    }
+                                }
+
+                                val finalRGB = Color.HSBtoRGB(hue, saturation, brightness)
+                                val finalColor = Color(finalRGB)
+                                colorValue.set(finalColor)
+
+                                // Preview final
+                                val previewSubSize = 6
+                                drawRect(
+                                    startX + 75,
+                                    startY - 10,
+                                    startX + 75 + previewSubSize,
+                                    startY - 10 + previewSubSize,
+                                    finalColor.rgb
+                                )
+
+                                yPos += colorPickerHeight + previewSize + 8
+                            } else {
+                                yPos += previewSize + 15
+                            }
+
+                            if (mouseButton == -1) {
+                                sliderValueHeld = null
+                            }
                         }
 
                         else -> {

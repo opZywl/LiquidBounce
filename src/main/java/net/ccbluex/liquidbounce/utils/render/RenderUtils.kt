@@ -607,6 +607,31 @@ object RenderUtils : MinecraftInstance {
         drawBorder(x, y, x2, y2, width, borderColor)
     }
 
+    fun drawBorderedRectRGB(x: Int, y: Int, x2: Int, y2: Int, width: Float, color1: Int, color2: Int) {
+        drawRect(x, y, x2, y2, color2)
+        glEnable(GL_BLEND)
+        glDisable(GL_TEXTURE_2D)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glEnable(GL_LINE_SMOOTH)
+
+        glColor(color1)
+        glLineWidth(width)
+        glBegin(1)
+        glVertex2d(x.toDouble(), y.toDouble())
+        glVertex2d(x.toDouble(), y2.toDouble())
+        glVertex2d(x2.toDouble(), y2.toDouble())
+        glVertex2d(x2.toDouble(), y.toDouble())
+        glVertex2d(x.toDouble(), y.toDouble())
+        glVertex2d(x2.toDouble(), y.toDouble())
+        glVertex2d(x.toDouble(), y2.toDouble())
+        glVertex2d(x2.toDouble(), y2.toDouble())
+        glEnd()
+
+        glEnable(GL_TEXTURE_2D)
+        glDisable(GL_BLEND)
+        glDisable(GL_LINE_SMOOTH)
+    }
+
     fun drawRoundedBorderRect(
         x: Float, y: Float, x2: Float, y2: Float, width: Float, color1: Int, color2: Int, radius: Float
     ) {
