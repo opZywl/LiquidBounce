@@ -15,9 +15,7 @@ import net.ccbluex.liquidbounce.utils.block.*
 import net.ccbluex.liquidbounce.utils.block.BlockUtils.getBlockName
 import net.ccbluex.liquidbounce.utils.block.BlockUtils.getCenterDistance
 import net.ccbluex.liquidbounce.utils.block.BlockUtils.isBlockBBValid
-import net.ccbluex.liquidbounce.utils.block.BlockUtils.searchBlocks
 import net.ccbluex.liquidbounce.utils.client.PacketUtils.sendPacket
-import net.ccbluex.liquidbounce.utils.extensions.ceilInt
 import net.ccbluex.liquidbounce.utils.extensions.eyes
 import net.ccbluex.liquidbounce.utils.extensions.onPlayerRightClick
 import net.ccbluex.liquidbounce.utils.extensions.rotation
@@ -77,6 +75,8 @@ object Fucker : Module("Fucker", Category.WORLD, hideModule = false) {
 
     private val ignoreOwnBed by boolean("IgnoreOwnBed", true)
     private val ownBedDist by int("MaxBedDistance", 16, 1..32) { ignoreOwnBed }
+
+    private val testsuperwow by ColorValue("SuperWow", Color.WHITE, false, false)
 
     /**
      * VALUES

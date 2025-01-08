@@ -391,6 +391,8 @@ class ColorValue(
     var brightness = 1f
     var alpha = 1f
 
+    var hueSliderColor = value
+
     init {
         changeValue(defaultColor)
     }
