@@ -41,7 +41,7 @@ sealed class Value<T>(
         return set(new)
     }
 
-    fun set(newValue: T, saveImmediately: Boolean = true): Boolean {
+    open fun set(newValue: T, saveImmediately: Boolean = true): Boolean {
         if (newValue == value || hidden || excluded)
             return false
 
@@ -124,7 +124,7 @@ sealed class Value<T>(
 
     fun shouldRender() = isSupported() && !hidden
 
-    fun reset() = set(default)
+    open fun reset() = set(default)
 }
 
 /**
@@ -444,6 +444,13 @@ class ColorValue(
             if (argb != null) return Color(argb, true)
         }
         return null
+    }
+
+    // Any value set that is not coming from the ClickGUI styles should have the hue slider color changed too
+    override fun set(newValue: Color, saveImmediately: Boolean) = super.set(newValue, saveImmediately).also {
+        if (it && saveImmediately) {
+            hueSliderColor = newValue
+        }
     }
 }
 

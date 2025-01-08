@@ -76,7 +76,7 @@ object Fucker : Module("Fucker", Category.WORLD, hideModule = false) {
     private val ignoreOwnBed by boolean("IgnoreOwnBed", true)
     private val ownBedDist by int("MaxBedDistance", 16, 1..32) { ignoreOwnBed }
 
-    private val testsuperwow by ColorValue("SuperWow", Color.WHITE, false, false)
+    private val testsuperwow by ColorValue("SuperWow", Color.CYAN, false, false)
 
     /**
      * VALUES

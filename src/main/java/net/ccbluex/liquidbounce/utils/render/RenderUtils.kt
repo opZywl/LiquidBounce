@@ -665,6 +665,7 @@ object RenderUtils : MinecraftInstance {
     }
 
     fun drawBorder(x: Int, y: Int, x2: Int, y2: Int, width: Int, color: Int) {
+        glPushMatrix()
         glEnable(GL_BLEND)
         glDisable(GL_TEXTURE_2D)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -680,6 +681,7 @@ object RenderUtils : MinecraftInstance {
         glEnable(GL_TEXTURE_2D)
         glDisable(GL_BLEND)
         glDisable(GL_LINE_SMOOTH)
+        glPopMatrix()
     }
 
     fun drawRoundedBorder(x: Float, y: Float, x2: Float, y2: Float, width: Float, color: Int, radius: Float) {

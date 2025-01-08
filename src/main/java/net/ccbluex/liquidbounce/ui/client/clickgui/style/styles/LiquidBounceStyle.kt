@@ -8,8 +8,6 @@ package net.ccbluex.liquidbounce.ui.client.clickgui.style.styles
 import net.ccbluex.liquidbounce.config.*
 import net.ccbluex.liquidbounce.features.module.modules.render.ClickGUI.guiColor
 import net.ccbluex.liquidbounce.features.module.modules.render.ClickGUI.scale
-import net.ccbluex.liquidbounce.file.FileManager.saveConfig
-import net.ccbluex.liquidbounce.file.FileManager.valuesConfig
 import net.ccbluex.liquidbounce.ui.client.clickgui.ClickGui.clamp
 import net.ccbluex.liquidbounce.ui.client.clickgui.Panel
 import net.ccbluex.liquidbounce.ui.client.clickgui.elements.ButtonElement
@@ -24,7 +22,6 @@ import net.ccbluex.liquidbounce.utils.extensions.lerpWith
 import net.ccbluex.liquidbounce.utils.render.RenderUtils
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawBorderedRect
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawRect
-import net.ccbluex.liquidbounce.utils.timing.WaitTickUtils
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.util.StringUtils
 import net.minecraftforge.fml.relauncher.Side
@@ -384,36 +381,55 @@ object LiquidBounceStyle : Style() {
                                 value.get()
                             }
 
-                            val previewSize = 10
-                            val startX = moduleElement.x + moduleElement.width + 4
-                            val previewY1 = yPos + 2
-                            val previewX2 = startX + previewSize
-                            val previewY2 = previewY1 + previewSize
+                            val spacing = 12
 
+                            val startX = moduleElement.x + moduleElement.width + 4
+                            val startY = yPos
+
+                            // Color preview
+                            val colorPreviewSize = 10
+                            val colorPreviewX2 = maxX - colorPreviewSize
+                            val colorPreviewX1 = colorPreviewX2 - colorPreviewSize
+                            val colorPreviewY1 = startY + 3
+                            val colorPreviewY2 = colorPreviewY1 + colorPreviewSize
+
+                            // Text
+                            val textX = startX + 1F
+                            val textY = startY + 4F
+
+                            // Sliders
                             val hueSliderWidth = 7
                             val hueSliderHeight = 50
                             val colorPickerWidth = 75
                             val colorPickerHeight = 50
 
-                            if (mouseButton == 0 && mouseX in startX..previewX2 && mouseY in previewY1..previewY2) {
+                            val colorPickerStartY = colorPreviewY2 + spacing / 2
+                            val colorPickerEndY = colorPickerStartY + colorPickerHeight
+
+                            val hueSliderStartY = colorPickerStartY
+                            val hueSliderEndY = colorPickerStartY + hueSliderHeight
+
+                            val fullHeight =
+                                if (value.showPicker) colorPickerHeight + colorPreviewSize + spacing else spacing + 2
+
+                            if (mouseButton == 0 && mouseX in colorPreviewX1..colorPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2) {
                                 value.showPicker = !value.showPicker
                                 clickSound()
                                 return true
                             }
 
-                            val startY = previewY1 + previewSize + 12
+                            drawRect(startX, startY, maxX, startY + fullHeight, Int.MIN_VALUE)
 
-                            drawRect(
-                                startX,
-                                previewY1,
-                                maxX,
-                                (if (!value.showPicker) startY + colorPickerHeight + 2 else previewY2) + 2,
-                                Int.MIN_VALUE
-                            )
+                            val display = "Color: ${"#%01X".format(currentColor.rgb)}"
 
-                            drawRect(startX, previewY1, previewX2, previewY2, currentColor.rgb)
+                            font35.drawStringWithShadow(display, textX, textY, Color.WHITE.rgb)
 
-                            if (!value.showPicker) {
+                            drawRect(colorPreviewX1, colorPreviewY1, colorPreviewX2, colorPreviewY2, currentColor.rgb)
+
+                            // Rainbow rectangle next to it?
+                            // Maybe with a blue border to indicate which one is chosen?
+
+                            if (value.showPicker) {
                                 if (!value.rainbow) {
                                     val hueSliderColor = value.hueSliderColor
 
@@ -423,18 +439,6 @@ object LiquidBounceStyle : Style() {
                                     var (currHue, currSaturation, currBrightness) = Color.RGBtoHSB(
                                         currentColor.red, currentColor.green, currentColor.blue, null
                                     )
-
-                                    val display = "Color"
-
-                                    drawRect(
-                                        startX - 2,
-                                        startY - 12,
-                                        startX,
-                                        startY + colorPickerHeight + 2,
-                                        Color(30, 30, 30, 160).rgb
-                                    )
-
-                                    font35.drawStringWithShadow(display, startX + 1F, startY - 10F, Color.WHITE.rgb)
 
                                     // Color Picker
                                     value.updateTextureCache(
@@ -453,14 +457,20 @@ object LiquidBounceStyle : Style() {
                                             }
                                         },
                                         drawAt = { id ->
-                                            drawTexture(id, startX, startY, colorPickerWidth, colorPickerHeight)
+                                            drawTexture(
+                                                id,
+                                                startX,
+                                                colorPickerStartY,
+                                                colorPickerWidth,
+                                                colorPickerHeight
+                                            )
                                         })
 
                                     val markerX = startX + (currSaturation * colorPickerWidth).toInt()
-                                    val markerY = startY + ((1.0f - currBrightness) * colorPickerHeight).toInt()
+                                    val markerY = colorPickerStartY + ((1.0f - currBrightness) * colorPickerHeight).toInt()
 
                                     RenderUtils.drawBorder(
-                                        markerX - 2f, markerY - 2f, markerX + 3f, markerY + 3f, 1.0f, Color.WHITE.rgb
+                                        markerX - 2f, markerY - 2f, markerX + 3f, markerY + 3f, 1.5f, Color.WHITE.rgb
                                     )
 
                                     val hueSliderX = startX + colorPickerWidth + 5
@@ -481,31 +491,38 @@ object LiquidBounceStyle : Style() {
                                             }
                                         },
                                         drawAt = { id ->
-                                            drawTexture(id, hueSliderX, startY, hueSliderWidth, hueSliderHeight)
+                                            drawTexture(
+                                                id,
+                                                hueSliderX,
+                                                colorPickerStartY,
+                                                hueSliderWidth,
+                                                hueSliderHeight
+                                            )
                                         })
 
-                                    val hueMarkerY = startY + (hue * hueSliderHeight)
+                                    val hueMarkerY = hueSliderStartY + (hue * hueSliderHeight)
 
                                     RenderUtils.drawBorder(
                                         hueSliderX.toFloat() - 1,
                                         hueMarkerY - 1f,
                                         hueSliderX + hueSliderWidth + 1f,
-                                        (hueMarkerY + 1).coerceAtMost((startY + hueSliderHeight).toFloat()) + 1,
-                                        2f,
+                                        (hueMarkerY + 1).coerceAtMost((hueSliderEndY).toFloat()) + 1,
+                                        1.5f,
                                         Color.WHITE.rgb,
                                     )
 
                                     val inColorPicker =
-                                        mouseX in startX until startX + colorPickerWidth && mouseY in startY until startY + colorPickerHeight
+                                        mouseX in startX until startX + colorPickerWidth && mouseY in colorPickerStartY until colorPickerEndY
                                     val inHueSlider =
-                                        mouseX in hueSliderX - 1..hueSliderX + hueSliderWidth + 1 && mouseY in startY until startY + hueSliderHeight
+                                        mouseX in hueSliderX - 1..hueSliderX + hueSliderWidth + 1 && mouseY in hueSliderStartY until hueSliderEndY
 
                                     if ((mouseButton == 0 || sliderValueHeld == value) && (inColorPicker || inHueSlider)) {
                                         if (inColorPicker) {
                                             val newS = ((mouseX - startX) / colorPickerWidth.toFloat()).coerceIn(0f, 1f)
                                             val newB =
-                                                (1.0f - (mouseY - startY) / colorPickerHeight.toFloat()).coerceIn(
-                                                    0f, 1f
+                                                (1.0f - (mouseY - colorPickerStartY) / colorPickerHeight.toFloat()).coerceIn(
+                                                    0f,
+                                                    1f
                                                 )
                                             saturation = newS
                                             brightness = newB
@@ -514,7 +531,10 @@ object LiquidBounceStyle : Style() {
                                         var finalColor = Color(Color.HSBtoRGB(hue, saturation, brightness))
 
                                         if (inHueSlider) {
-                                            currHue = ((mouseY - startY) / hueSliderHeight.toFloat()).coerceIn(0f, 1f)
+                                            currHue = ((mouseY - hueSliderStartY) / hueSliderHeight.toFloat()).coerceIn(
+                                                0f,
+                                                1f
+                                            )
 
                                             finalColor = Color(Color.HSBtoRGB(currHue, currSaturation, currBrightness))
                                         }
@@ -525,36 +545,16 @@ object LiquidBounceStyle : Style() {
                                             value.hueSliderColor = finalColor
                                         }
 
-                                        value.set(finalColor, false)
-
-                                        // TODO: put it on style class
-                                        with(WaitTickUtils) {
-                                            if (!hasScheduled(value)) {
-                                                conditionalSchedule(value, 10) {
-                                                    (sliderValueHeld == null).also { if (it) saveConfig(valuesConfig) }
-                                                }
-                                            }
-                                        }
+                                        value.setAndSaveValueOnButtonRelease(finalColor)
 
                                         if (mouseButton == 0) {
                                             return true
                                         }
                                     }
-
-                                    val previewSubSize = 6
-
-                                    drawRect(
-                                        startX + 75,
-                                        startY - 10,
-                                        startX + 75 + previewSubSize,
-                                        startY - 10 + previewSubSize,
-                                        currentColor.rgb
-                                    )
-
-                                    yPos += colorPickerHeight - previewSize + 24
+                                    yPos += colorPickerHeight - colorPreviewSize + spacing + 6
                                 }
                             }
-                            yPos += 12
+                            yPos += spacing
                         }
 
                         else -> {
