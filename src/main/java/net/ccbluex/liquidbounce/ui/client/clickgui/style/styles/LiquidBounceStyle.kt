@@ -111,6 +111,16 @@ object LiquidBounceStyle : Style() {
                 val minX = moduleElement.x + moduleElement.width + 4
                 val maxX = moduleElement.x + moduleElement.width + moduleElement.settingsWidth
 
+                if (moduleElement.settingsWidth > 0 && moduleElement.settingsHeight > 0) drawBorderedRect(
+                    minX,
+                    yPos,
+                    maxX,
+                    yPos + moduleElement.settingsHeight,
+                    1,
+                    Color.GRAY.rgb,
+                    Int.MIN_VALUE
+                )
+
                 for (value in moduleValues) {
                     assumeNonVolatile = value.get() is Number
 
@@ -121,8 +131,6 @@ object LiquidBounceStyle : Style() {
                             val text = value.name
 
                             moduleElement.settingsWidth = font35.getStringWidth(text) + 8
-
-                            drawRect(minX, yPos + 2, maxX, yPos + 14, Int.MIN_VALUE)
 
                             if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 2..yPos + 14) {
                                 value.toggle()
@@ -148,8 +156,6 @@ object LiquidBounceStyle : Style() {
                                 return true
                             }
 
-                            drawRect(minX, yPos + 2, maxX, yPos + 14, Int.MIN_VALUE)
-
                             font35.drawString("§c$text", minX + 2, yPos + 4, Color.WHITE.rgb)
                             font35.drawString(
                                 if (value.openList) "-" else "+",
@@ -164,8 +170,6 @@ object LiquidBounceStyle : Style() {
                                 moduleElement.settingsWidth = font35.getStringWidth(valueOfList) + 16
 
                                 if (value.openList) {
-                                    drawRect(minX, yPos + 2, maxX, yPos + 14, Int.MIN_VALUE)
-
                                     if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 2..yPos + 14) {
                                         value.set(valueOfList)
                                         clickSound()
@@ -194,7 +198,7 @@ object LiquidBounceStyle : Style() {
                             val text = value.name + "§f: §c" + round(value.get()) + " §8${suffix}§c"
                             moduleElement.settingsWidth = font35.getStringWidth(text) + 8
 
-                            if ((mouseButton == 0 || sliderValueHeld == value) && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21) {
+                            if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21 || sliderValueHeld == value) {
                                 val percentage = (mouseX - minX - 4) / (maxX - minX - 8).toFloat()
                                 value.set(
                                     round(value.minimum + (value.maximum - value.minimum) * percentage).coerceIn(
@@ -209,7 +213,6 @@ object LiquidBounceStyle : Style() {
                                 if (mouseButton == 0) return true
                             }
 
-                            drawRect(minX, yPos + 2, maxX, yPos + 24, Int.MIN_VALUE)
                             drawRect(minX + 4, yPos + 18, maxX - 4, yPos + 19, Int.MAX_VALUE)
 
                             val displayValue = value.get().coerceIn(value.range)
@@ -231,7 +234,7 @@ object LiquidBounceStyle : Style() {
 
                             moduleElement.settingsWidth = font35.getStringWidth(text) + 8
 
-                            if ((mouseButton == 0 || sliderValueHeld == value) && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21) {
+                            if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21 || sliderValueHeld == value) {
                                 val percentage = (mouseX - minX - 4) / (maxX - minX - 8).toFloat()
                                 value.set(
                                     (value.minimum + (value.maximum - value.minimum) * percentage).roundToInt()
@@ -245,7 +248,6 @@ object LiquidBounceStyle : Style() {
                                 if (mouseButton == 0) return true
                             }
 
-                            drawRect(minX, yPos + 2, maxX, yPos + 24, Int.MIN_VALUE)
                             drawRect(minX + 4, yPos + 18, maxX - 4, yPos + 19, Int.MAX_VALUE)
 
                             val displayValue = value.get().coerceIn(value.range)
@@ -265,7 +267,7 @@ object LiquidBounceStyle : Style() {
                             val text = "${value.name}§f: §c$slider1 §f- §c$slider2 §8${suffix}§c (Beta)"
                             moduleElement.settingsWidth = font35.getStringWidth(text) + 8
 
-                            if ((mouseButton == 0 || sliderValueHeld == value) && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21) {
+                            if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21 || sliderValueHeld == value) {
                                 val slider1Pos =
                                     minX + ((slider1 - value.minimum).toFloat() / (value.maximum - value.minimum)) * (maxX - minX)
                                 val slider2Pos =
@@ -287,7 +289,6 @@ object LiquidBounceStyle : Style() {
                                 if (mouseButton == 0) return true
                             }
 
-                            drawRect(minX, yPos + 2, maxX, yPos + 24, Int.MIN_VALUE)
                             drawRect(minX + 4, yPos + 18, maxX - 4, yPos + 19, Int.MAX_VALUE)
 
                             val displayValue1 = value.get().first
@@ -314,7 +315,7 @@ object LiquidBounceStyle : Style() {
                                 "${value.name}§f: §c${round(slider1)} §f- §c${round(slider2)} §8${suffix}§c (Beta)"
                             moduleElement.settingsWidth = font35.getStringWidth(text) + 8
 
-                            if ((mouseButton == 0 || sliderValueHeld == value) && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21) {
+                            if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21 || sliderValueHeld == value) {
                                 val slider1Pos =
                                     minX + (slider1 - value.minimum) / (value.maximum - value.minimum) * (maxX - minX)
                                 val slider2Pos =
@@ -336,7 +337,6 @@ object LiquidBounceStyle : Style() {
                                 if (mouseButton == 0) return true
                             }
 
-                            drawRect(minX, yPos + 2, maxX, yPos + 24, Int.MIN_VALUE)
                             drawRect(minX + 4, yPos + 18, maxX - 4, yPos + 19, Int.MAX_VALUE)
 
                             val displayValue1 = value.get().start
@@ -367,8 +367,6 @@ object LiquidBounceStyle : Style() {
                                 return true
                             }
 
-                            drawRect(minX, yPos + 2, maxX, yPos + 14, Int.MIN_VALUE)
-
                             font35.drawString(displayString, minX + 2, yPos + 4, Color.WHITE.rgb)
 
                             yPos += 11
@@ -381,20 +379,20 @@ object LiquidBounceStyle : Style() {
                                 value.get()
                             }
 
-                            val spacing = 12
+                            val spacing = 10
 
                             val startX = moduleElement.x + moduleElement.width + 4
-                            val startY = yPos
+                            val startY = yPos - 1
 
                             // Color preview
                             val colorPreviewSize = 10
                             val colorPreviewX2 = maxX - colorPreviewSize
                             val colorPreviewX1 = colorPreviewX2 - colorPreviewSize
-                            val colorPreviewY1 = startY + 3
+                            val colorPreviewY1 = startY + 2
                             val colorPreviewY2 = colorPreviewY1 + colorPreviewSize
 
                             // Text
-                            val textX = startX + 1F
+                            val textX = startX + 2F
                             val textY = startY + 4F
 
                             // Sliders
@@ -403,14 +401,13 @@ object LiquidBounceStyle : Style() {
                             val colorPickerWidth = 75
                             val colorPickerHeight = 50
 
-                            val colorPickerStartY = colorPreviewY2 + spacing / 2
+                            val colorPickerStartX = textX.toInt()
+                            val colorPickerEndX = colorPickerStartX + colorPickerWidth
+                            val colorPickerStartY = colorPreviewY2 + spacing / 3
                             val colorPickerEndY = colorPickerStartY + colorPickerHeight
 
                             val hueSliderStartY = colorPickerStartY
                             val hueSliderEndY = colorPickerStartY + hueSliderHeight
-
-                            val fullHeight =
-                                if (value.showPicker) colorPickerHeight + colorPreviewSize + spacing else spacing + 2
 
                             if (mouseButton == 0 && mouseX in colorPreviewX1..colorPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2) {
                                 value.showPicker = !value.showPicker
@@ -418,9 +415,9 @@ object LiquidBounceStyle : Style() {
                                 return true
                             }
 
-                            drawRect(startX, startY, maxX, startY + fullHeight, Int.MIN_VALUE)
+                            val display = "Color: ${"#%08X".format(currentColor.rgb)}"
 
-                            val display = "Color: ${"#%01X".format(currentColor.rgb)}"
+                            moduleElement.settingsWidth = font35.getStringWidth(display) + 8
 
                             font35.drawStringWithShadow(display, textX, textY, Color.WHITE.rgb)
 
@@ -459,21 +456,22 @@ object LiquidBounceStyle : Style() {
                                         drawAt = { id ->
                                             drawTexture(
                                                 id,
-                                                startX,
+                                                colorPickerStartX,
                                                 colorPickerStartY,
                                                 colorPickerWidth,
                                                 colorPickerHeight
                                             )
                                         })
 
-                                    val markerX = startX + (currSaturation * colorPickerWidth).toInt()
-                                    val markerY = colorPickerStartY + ((1.0f - currBrightness) * colorPickerHeight).toInt()
+                                    val markerX = colorPickerStartX + (currSaturation * colorPickerWidth).toInt()
+                                    val markerY =
+                                        colorPickerStartY + ((1.0f - currBrightness) * colorPickerHeight).toInt()
 
                                     RenderUtils.drawBorder(
                                         markerX - 2f, markerY - 2f, markerX + 3f, markerY + 3f, 1.5f, Color.WHITE.rgb
                                     )
 
-                                    val hueSliderX = startX + colorPickerWidth + 5
+                                    val hueSliderX = colorPickerEndX + 5
 
                                     // Hue slider
                                     value.updateTextureCache(
@@ -512,13 +510,17 @@ object LiquidBounceStyle : Style() {
                                     )
 
                                     val inColorPicker =
-                                        mouseX in startX until startX + colorPickerWidth && mouseY in colorPickerStartY until colorPickerEndY
+                                        mouseX in colorPickerStartX until colorPickerEndX && mouseY in colorPickerStartY until colorPickerEndY
                                     val inHueSlider =
                                         mouseX in hueSliderX - 1..hueSliderX + hueSliderWidth + 1 && mouseY in hueSliderStartY until hueSliderEndY
 
                                     if ((mouseButton == 0 || sliderValueHeld == value) && (inColorPicker || inHueSlider)) {
                                         if (inColorPicker) {
-                                            val newS = ((mouseX - startX) / colorPickerWidth.toFloat()).coerceIn(0f, 1f)
+                                            val newS =
+                                                ((mouseX - colorPickerStartX) / colorPickerWidth.toFloat()).coerceIn(
+                                                    0f,
+                                                    1f
+                                                )
                                             val newB =
                                                 (1.0f - (mouseY - colorPickerStartY) / colorPickerHeight.toFloat()).coerceIn(
                                                     0f,
@@ -574,9 +576,9 @@ object LiquidBounceStyle : Style() {
                 moduleElement.settingsHeight = yPos - moduleElement.y - 4
 
                 if (moduleElement.settingsWidth > 0 && yPos > moduleElement.y + 4) {
-                    if (mouseButton != null && mouseX in minX..maxX && mouseY in moduleElement.y + 6..yPos + 2) return true
-
-                    drawBorderedRect(minX, moduleElement.y + 6, maxX, yPos + 2, 1, Color.GRAY.rgb, 0)
+                    if (mouseButton != null && mouseX in minX..maxX && mouseY in moduleElement.y + 6..yPos + 2) {
+                        return true
+                    }
                 }
             }
         }

@@ -936,6 +936,7 @@ object RenderUtils : MinecraftInstance {
         disableBlend()
     }
 
+    // TODO: Use caching to save performance
     fun drawFilledCircle(xx: Int, yy: Int, radius: Float, color: Color) {
         val sections = 50
         val dAngle = 2 * Math.PI / sections
