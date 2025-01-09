@@ -122,9 +122,11 @@ sealed class Value<T>(
         set(value)
     }
 
+    open fun getString() = "$value"
+
     fun shouldRender() = isSupported() && !hidden
 
-    open fun reset() = set(default)
+    fun reset() = set(default)
 }
 
 /**
@@ -432,16 +434,28 @@ class ColorValue(
         return newValue
     }
 
-    override fun toJsonF(): JsonElement? {
+    override fun toJsonF(): JsonElement {
         val argbHex = "#%08X".format(value.rgb)
-        return JsonPrimitive(argbHex)
+
+        return JsonPrimitive("hex: $argbHex, rainbow: $rainbow")
     }
 
     override fun fromJsonF(element: JsonElement): Color? {
         if (element.isJsonPrimitive) {
-            val raw = element.asString.removePrefix("#")
-            val argb = raw.toLongOrNull(16)?.toInt()
-            if (argb != null) return Color(argb, true)
+            val raw = element.asString
+
+            val regex = """hex:\s*#([A-Fa-f0-9]{6,8}),\s*rainbow:\s*(true|false)""".toRegex()
+            val matchResult = regex.find(raw)
+
+            if (matchResult != null) {
+                val hexString = matchResult.groupValues[1]
+                val rainbowString = matchResult.groupValues[2].toBoolean()
+
+                val argb = hexString.toLongOrNull(16)?.toInt()
+                if (argb != null) {
+                    return Color(argb, true).also { rainbow = rainbowString }
+                }
+            }
         }
         return null
     }
@@ -451,6 +465,15 @@ class ColorValue(
         if (it && saveImmediately) {
             hueSliderColor = newValue
         }
+    }
+
+    override fun getString() = "Color[hex=${"#%06X".format(value.rgb)},rainbow=${rainbow}]"
+
+    fun readColorFromConfig(str: String): List<String>? {
+        val regex = """Color\[hex=#([0-9A-Fa-f]{6,8}),\s*rainbow=(true|false)]""".toRegex()
+        val matchResult = regex.find(str)
+
+        return matchResult?.let { listOf(it.groupValues[1], it.groupValues[2]) }
     }
 }
 
