@@ -602,7 +602,7 @@ object RenderUtils : MinecraftInstance {
         drawBorder(x, y, x2, y2, width, borderColor)
     }
 
-    fun drawBorderedRect(x: Int, y: Int, x2: Int, y2: Int, width: Int, borderColor: Int, rectColor: Int) {
+    fun drawBorderedRect(x: Int, y: Int, x2: Int, y2: Int, width: Number, borderColor: Int, rectColor: Int) {
         drawRect(x, y, x2, y2, rectColor)
         drawBorder(x, y, x2, y2, width, borderColor)
     }
@@ -664,7 +664,7 @@ object RenderUtils : MinecraftInstance {
         glDisable(GL_LINE_SMOOTH)
     }
 
-    fun drawBorder(x: Int, y: Int, x2: Int, y2: Int, width: Int, color: Int) {
+    fun drawBorder(x: Int, y: Int, x2: Int, y2: Int, width: Number, color: Int) {
         glPushMatrix()
         glEnable(GL_BLEND)
         glDisable(GL_TEXTURE_2D)

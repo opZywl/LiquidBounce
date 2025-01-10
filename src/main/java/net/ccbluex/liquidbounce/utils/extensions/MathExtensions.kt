@@ -230,3 +230,7 @@ fun FloatRangeValue.lerpWith(t: Float) = minimum + (maximum - minimum) * t
 fun IntegerValue.lerpWith(t: Float) = (minimum + (maximum - minimum) * t).roundToInt()
 
 fun FloatValue.lerpWith(t: Float) = minimum + (maximum - minimum) * t
+
+fun IntRange.lerpWith(t: Float) = start + (endInclusive - start) * t
+
+fun Int.lerpWith(other: Int, t: Float) = this + (other - this) * t

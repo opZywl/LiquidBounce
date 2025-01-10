@@ -15,8 +15,11 @@ import net.ccbluex.liquidbounce.ui.font.GameFontRenderer
 import net.ccbluex.liquidbounce.utils.client.ClientUtils.LOGGER
 import net.ccbluex.liquidbounce.utils.kotlin.RandomUtils.nextFloat
 import net.ccbluex.liquidbounce.utils.kotlin.RandomUtils.nextInt
+import net.ccbluex.liquidbounce.utils.render.ColorUtils
 import net.minecraft.client.gui.FontRenderer
+import org.lwjgl.input.Mouse
 import java.awt.Color
+import javax.vecmath.Vector2f
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -387,52 +390,32 @@ class ColorValue(
     var rainbow: Boolean = false,
     var showPicker: Boolean = false
 ) : Value<Color>(name, defaultColor) {
-
-    var hue = 0f
-    var saturation = 1f
-    var brightness = 1f
-    var alpha = 1f
-
     var hueSliderColor = value
+
+    // Sliders
+    var hueSliderY = 0F
+    var opacitySliderY = 0F
+
+    // Slider positions in the 0-1 range
+    var colorPickerPos = Vector2f(0f, 0f)
+
+    var lastChosenSlider: SliderType? = null
+        get() {
+            if (!Mouse.isButtonDown(0)) field = null
+            return field
+        }
 
     init {
         changeValue(defaultColor)
     }
 
-    fun getColor(): Color {
-        val base = Color.getHSBColor(hue, saturation, brightness)
-        val finalAlpha = (alpha * 255).toInt().coerceIn(0, 255)
-        return Color(base.red, base.green, base.blue, finalAlpha)
+    fun selectedColor() = if (rainbow) {
+        ColorUtils.rainbow(alpha = opacitySliderY)
+    }  else {
+        get()
     }
 
-    fun setColor(color: Color) {
-        set(color)
-    }
-
-    override fun onInit(value: Color) {
-        val r = value.red
-        val g = value.green
-        val b = value.blue
-        val a = value.alpha
-        val hsb = Color.RGBtoHSB(r, g, b, null)
-        hue = hsb[0]
-        saturation = hsb[1]
-        brightness = hsb[2]
-        alpha = a / 255f
-    }
-
-    override fun onChange(oldValue: Color, newValue: Color): Color {
-        val r = newValue.red
-        val g = newValue.green
-        val b = newValue.blue
-        val a = newValue.alpha
-        val hsb = Color.RGBtoHSB(r, g, b, null)
-        hue = hsb[0]
-        saturation = hsb[1]
-        brightness = hsb[2]
-        alpha = a / 255f
-        return newValue
-    }
+    fun setColor(color: Color) = set(color)
 
     override fun toJsonF(): JsonElement {
         val argbHex = "#%08X".format(value.rgb)
@@ -474,6 +457,12 @@ class ColorValue(
         val matchResult = regex.find(str)
 
         return matchResult?.let { listOf(it.groupValues[1], it.groupValues[2]) }
+    }
+
+    enum class SliderType {
+        COLOR,
+        HUE,
+        OPACITY
     }
 }
 
