@@ -18,6 +18,7 @@ import net.ccbluex.liquidbounce.utils.block.BlockUtils.getBlockName
 import net.ccbluex.liquidbounce.utils.extensions.component1
 import net.ccbluex.liquidbounce.utils.extensions.component2
 import net.ccbluex.liquidbounce.utils.extensions.lerpWith
+import net.ccbluex.liquidbounce.utils.render.ColorUtils.withAlpha
 import net.ccbluex.liquidbounce.utils.render.RenderUtils
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawBorderedRect
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawFilledCircle
@@ -508,7 +509,8 @@ object SlowlyStyle : Style() {
                                         })
 
                                     val markerX = colorPickerStartX + (currSaturation * colorPickerWidth).toInt()
-                                    val markerY = colorPickerStartY + ((1.0f - currBrightness) * colorPickerHeight).toInt()
+                                    val markerY =
+                                        colorPickerStartY + ((1.0f - currBrightness) * colorPickerHeight).toInt()
 
                                     RenderUtils.drawBorder(
                                         markerX - 2f, markerY - 2f, markerX + 3f, markerY + 3f, 1.5f, Color.WHITE.rgb
@@ -541,6 +543,56 @@ object SlowlyStyle : Style() {
                                             )
                                         })
 
+                                    value.updateTextureCache(
+                                        id = 2,
+                                        hue = currHue,
+                                        width = hueSliderWidth,
+                                        height = hueSliderHeight,
+                                        generateImage = { image, _ ->
+                                            val gridSize = 1
+
+                                            for (y in 0 until hueSliderHeight) {
+                                                for (x in 0 until hueSliderWidth) {
+                                                    val gridX = x / gridSize
+                                                    val gridY = y / gridSize
+
+                                                    val checkerboardColor = if ((gridY + gridX) % 2 == 0) {
+                                                        Color.WHITE.rgb
+                                                    } else {
+                                                        Color.BLACK.rgb
+                                                    }
+
+                                                    val alpha =
+                                                        ((1 - (y.toFloat() / hueSliderHeight.toFloat())) * 255).roundToInt()
+                                                    val colorAlpha = currentColor.withAlpha(alpha)
+
+                                                    val checkerboardRed = (checkerboardColor shr 16) and 0xFF
+                                                    val checkerboardGreen = (checkerboardColor shr 8) and 0xFF
+                                                    val checkerboardBlue = checkerboardColor and 0xFF
+
+                                                    val finalRed =
+                                                        (colorAlpha.red * (alpha / 255.0) + checkerboardRed * (1 - alpha / 255.0)).toInt()
+                                                    val finalGreen =
+                                                        (colorAlpha.green * (alpha / 255.0) + checkerboardGreen * (1 - alpha / 255.0)).toInt()
+                                                    val finalBlue =
+                                                        (colorAlpha.blue * (alpha / 255.0) + checkerboardBlue * (1 - alpha / 255.0)).toInt()
+
+                                                    val finalColor = Color(finalRed, finalGreen, finalBlue, alpha)
+
+                                                    image.setRGB(x, y, finalColor.rgb)
+                                                }
+                                            }
+                                        },
+                                        drawAt = { id ->
+                                            drawTexture(
+                                                id,
+                                                hueSliderX + hueSliderWidth + 5,
+                                                colorPickerStartY,
+                                                hueSliderWidth,
+                                                hueSliderHeight
+                                            )
+                                        })
+
                                     val hueMarkerY = hueSliderStartY + (hue * hueSliderHeight)
 
                                     RenderUtils.drawBorder(
@@ -559,7 +611,11 @@ object SlowlyStyle : Style() {
 
                                     if ((mouseButton == 0 || sliderValueHeld == value) && (inColorPicker || inHueSlider)) {
                                         if (inColorPicker) {
-                                            val newS = ((mouseX - colorPickerStartX) / colorPickerWidth.toFloat()).coerceIn(0f, 1f)
+                                            val newS =
+                                                ((mouseX - colorPickerStartX) / colorPickerWidth.toFloat()).coerceIn(
+                                                    0f,
+                                                    1f
+                                                )
                                             val newB =
                                                 (1.0f - (mouseY - colorPickerStartY) / colorPickerHeight.toFloat()).coerceIn(
                                                     0f,
