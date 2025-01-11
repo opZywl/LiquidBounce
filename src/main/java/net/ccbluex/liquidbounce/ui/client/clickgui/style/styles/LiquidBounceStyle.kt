@@ -203,7 +203,7 @@ object LiquidBounceStyle : Style() {
 
                             if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21 || sliderValueHeld == value) {
                                 val percentage = (mouseX - minX - 4) / (maxX - minX - 8).toFloat()
-                                value.set(
+                                value.setAndSaveValueOnButtonRelease(
                                     round(value.minimum + (value.maximum - value.minimum) * percentage).coerceIn(
                                         value.range
                                     )
@@ -239,7 +239,7 @@ object LiquidBounceStyle : Style() {
 
                             if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21 || sliderValueHeld == value) {
                                 val percentage = (mouseX - minX - 4) / (maxX - minX - 8).toFloat()
-                                value.set(
+                                value.setAndSaveValueOnButtonRelease(
                                     (value.minimum + (value.maximum - value.minimum) * percentage).roundToInt()
                                         .coerceIn(value.range)
                                 )
@@ -282,8 +282,14 @@ object LiquidBounceStyle : Style() {
                                 val percentage = (mouseX - minX - 4F) / (maxX - minX - 8F)
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
-                                    value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2))
-                                } else value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum))
+                                    withDelayedSave {
+                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                    }
+                                } else {
+                                    withDelayedSave {
+                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                    }
+                                }
 
                                 // Keep changing this slider until mouse is unpressed.
                                 sliderValueHeld = value
@@ -330,8 +336,14 @@ object LiquidBounceStyle : Style() {
                                 val percentage = (mouseX - minX - 4F) / (maxX - minX - 8F)
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
-                                    value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2))
-                                } else value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum))
+                                    withDelayedSave {
+                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                    }
+                                } else {
+                                    withDelayedSave {
+                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                    }
+                                }
 
                                 // Keep changing this slider until mouse is unpressed.
                                 sliderValueHeld = value

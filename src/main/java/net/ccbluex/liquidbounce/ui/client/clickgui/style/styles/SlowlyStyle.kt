@@ -240,7 +240,7 @@ object SlowlyStyle : Style() {
 
                             if (mouseButton == 0 && mouseX in x..x + width && mouseY in y - 2..y + 5 || sliderValueHeld == value) {
                                 val percentage = (mouseX - x) / width.toFloat()
-                                value.set(value.lerpWith(percentage).coerceIn(value.range))
+                                value.setAndSaveValueOnButtonRelease(value.lerpWith(percentage).coerceIn(value.range))
 
                                 // Keep changing this slider until mouse is unpressed.
                                 sliderValueHeld = value
@@ -278,7 +278,7 @@ object SlowlyStyle : Style() {
 
                             if (mouseButton == 0 && mouseX in x..x + width && mouseY in y - 2..y + 5 || sliderValueHeld == value) {
                                 val percentage = (mouseX - x) / width.toFloat()
-                                value.set(
+                                value.setAndSaveValueOnButtonRelease(
                                     (value.minimum + (value.maximum - value.minimum) * percentage).roundToInt()
                                         .coerceIn(value.range)
                                 )
@@ -323,8 +323,14 @@ object SlowlyStyle : Style() {
                                 val percentage = (mouseX - minX - 4F) / (maxX - minX - 8F)
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
-                                    value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2))
-                                } else value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum))
+                                    withDelayedSave {
+                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                    }
+                                } else {
+                                    withDelayedSave {
+                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                    }
+                                }
 
                                 // Keep changing this slider until mouse is unpressed.
                                 sliderValueHeld = value
@@ -374,8 +380,14 @@ object SlowlyStyle : Style() {
                                 val percentage = (mouseX - minX - 4F) / (maxX - minX - 8F)
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
-                                    value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2))
-                                } else value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum))
+                                    withDelayedSave {
+                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                    }
+                                } else {
+                                    withDelayedSave {
+                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                    }
+                                }
 
                                 // Keep changing this slider until mouse is unpressed.
                                 sliderValueHeld = value

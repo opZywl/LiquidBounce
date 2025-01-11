@@ -191,8 +191,8 @@ open class IntegerRangeValue(
     isSupported: (() -> Boolean)? = null,
 ) : Value<IntRange>(name, value, subjective, isSupported, suffix) {
 
-    fun setFirst(newValue: Int) = set(newValue..value.last)
-    fun setLast(newValue: Int) = set(value.first..newValue)
+    fun setFirst(newValue: Int, immediate: Boolean = true) = set(newValue..value.last, immediate)
+    fun setLast(newValue: Int, immediate: Boolean = true) = set(value.first..newValue, immediate)
 
     override fun toJsonF(): JsonElement {
         return JsonPrimitive("${value.first}-${value.last}")
@@ -230,8 +230,8 @@ open class FloatRangeValue(
     isSupported: (() -> Boolean)? = null,
 ) : Value<ClosedFloatingPointRange<Float>>(name, value, subjective, isSupported, suffix) {
 
-    fun setFirst(newValue: Float) = set(newValue..value.endInclusive)
-    fun setLast(newValue: Float) = set(value.start..newValue)
+    fun setFirst(newValue: Float, immediate: Boolean = true) = set(newValue..value.endInclusive, immediate)
+    fun setLast(newValue: Float, immediate: Boolean = true) = set(value.start..newValue, immediate)
 
     override fun toJsonF(): JsonElement {
         return JsonPrimitive("${value.start}-${value.endInclusive}")

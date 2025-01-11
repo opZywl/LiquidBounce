@@ -13,6 +13,7 @@ import net.ccbluex.liquidbounce.ui.client.clickgui.Panel
 import net.ccbluex.liquidbounce.ui.client.clickgui.elements.ButtonElement
 import net.ccbluex.liquidbounce.ui.client.clickgui.elements.ModuleElement
 import net.ccbluex.liquidbounce.ui.client.clickgui.style.Style
+import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.LiquidBounceStyle.setAndSaveValueOnButtonRelease
 import net.ccbluex.liquidbounce.ui.font.AWTFontRenderer.Companion.assumeNonVolatile
 import net.ccbluex.liquidbounce.ui.font.Fonts.font35
 import net.ccbluex.liquidbounce.utils.block.BlockUtils.getBlockName
@@ -202,7 +203,7 @@ object NullStyle : Style() {
 
                             if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21 || sliderValueHeld == value) {
                                 val percentage = (mouseX - minX - 4) / (maxX - minX - 8).toFloat()
-                                value.set(value.lerpWith(percentage).coerceIn(value.range))
+                                value.setAndSaveValueOnButtonRelease(value.lerpWith(percentage).coerceIn(value.range))
 
                                 // Keep changing this slider until mouse is unpressed.
                                 sliderValueHeld = value
@@ -234,7 +235,7 @@ object NullStyle : Style() {
 
                             if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 15..yPos + 21 || sliderValueHeld == value) {
                                 val percentage = (mouseX - minX - 4) / (maxX - minX - 8).toFloat()
-                                value.set(value.lerpWith(percentage).coerceIn(value.range))
+                                value.setAndSaveValueOnButtonRelease(value.lerpWith(percentage).coerceIn(value.range))
 
                                 // Keep changing this slider until mouse is unpressed.
                                 sliderValueHeld = value
@@ -274,8 +275,14 @@ object NullStyle : Style() {
                                 val percentage = (mouseX - minX - 4F) / (maxX - minX - 8F)
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
-                                    value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2))
-                                } else value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum))
+                                    withDelayedSave {
+                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                    }
+                                } else {
+                                    withDelayedSave {
+                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                    }
+                                }
 
                                 // Keep changing this slider until mouse is unpressed.
                                 sliderValueHeld = value
@@ -322,8 +329,14 @@ object NullStyle : Style() {
                                 val percentage = (mouseX - minX - 4F) / (maxX - minX - 8F)
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
-                                    value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2))
-                                } else value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum))
+                                    withDelayedSave {
+                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                    }
+                                } else {
+                                    withDelayedSave {
+                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                    }
+                                }
 
                                 // Keep changing this slider until mouse is unpressed.
                                 sliderValueHeld = value

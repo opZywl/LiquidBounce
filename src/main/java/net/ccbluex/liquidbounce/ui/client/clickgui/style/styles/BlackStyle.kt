@@ -241,7 +241,7 @@ object BlackStyle : Style() {
 
                             if (mouseButton == 0 && mouseX in minX..maxX && mouseY in y - 2..y + 5 || sliderValueHeld == value) {
                                 val percentage = (mouseX - x) / width.toFloat()
-                                value.set(
+                                value.setAndSaveValueOnButtonRelease(
                                     round(value.minimum + (value.maximum - value.minimum) * percentage).coerceIn(
                                         value.range
                                     )
@@ -281,7 +281,7 @@ object BlackStyle : Style() {
 
                             if (mouseButton == 0 && mouseX in minX..maxX && mouseY in y - 2..y + 5 || sliderValueHeld == value) {
                                 val percentage = (mouseX - x) / width.toFloat()
-                                value.set(value.lerpWith(percentage).coerceIn(value.range))
+                                value.setAndSaveValueOnButtonRelease(value.lerpWith(percentage).coerceIn(value.range))
 
                                 sliderValueHeld = value
 
@@ -321,8 +321,14 @@ object BlackStyle : Style() {
                                 val percentage = (mouseX - minX - 4F) / (maxX - minX - 8F)
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
-                                    value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2))
-                                } else value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum))
+                                    withDelayedSave {
+                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                    }
+                                } else {
+                                    withDelayedSave {
+                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                    }
+                                }
 
                                 sliderValueHeld = value
 
@@ -371,8 +377,14 @@ object BlackStyle : Style() {
                                 val percentage = (mouseX - minX - 4F) / (maxX - minX - 8F)
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
-                                    value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2))
-                                } else value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum))
+                                    withDelayedSave {
+                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                    }
+                                } else {
+                                    withDelayedSave {
+                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                    }
+                                }
 
                                 sliderValueHeld = value
 
@@ -447,7 +459,6 @@ object BlackStyle : Style() {
 
                             val hueSliderStartY = colorPickerStartY
                             val hueSliderEndY = colorPickerStartY + hueSliderHeight
-
 
                             val rainbow = value.rainbow
 
