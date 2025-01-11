@@ -16,6 +16,7 @@ import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.GlStateManager.*
+import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -788,6 +789,58 @@ object RenderUtils : MinecraftInstance {
         glVertex2d(x.toDouble(), y2.toDouble())
         glVertex2d(x2.toDouble(), y2.toDouble())
         glEnd()
+    }
+
+    /**
+     * Draw gradient rect.
+     *
+     * @param left       the left
+     * @param top        the top
+     * @param right      the right
+     * @param bottom     the bottom
+     * @param startColor the start color
+     * @param endColor   the end color
+     */
+    fun drawGradientRect(
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+        startColor: Int,
+        endColor: Int,
+        zLevel: Float
+    ) {
+        val a1 = (startColor shr 24 and 255) / 255f
+        val r1 = (startColor shr 16 and 255) / 255f
+        val g1 = (startColor shr 8 and 255) / 255f
+        val b1 = (startColor and 255) / 255f
+        val a2 = (endColor shr 24 and 255) / 255f
+        val r2 = (endColor shr 16 and 255) / 255f
+        val g2 = (endColor shr 8 and 255) / 255f
+        val b2 = (endColor and 255) / 255f
+
+        pushMatrix()
+        disableTexture2D()
+        enableBlend()
+        disableAlpha()
+        tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0)
+        shadeModel(GL_SMOOTH)
+
+        val tessellator = Tessellator.getInstance()
+        val buffer = tessellator.worldRenderer
+
+        buffer.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR)
+        buffer.pos(right.toDouble(), top.toDouble(), zLevel.toDouble()).color(r1, g1, b1, a1).endVertex()
+        buffer.pos(left.toDouble(), top.toDouble(), zLevel.toDouble()).color(r1, g1, b1, a1).endVertex()
+        buffer.pos(left.toDouble(), bottom.toDouble(), zLevel.toDouble()).color(r2, g2, b2, a2).endVertex()
+        buffer.pos(right.toDouble(), bottom.toDouble(), zLevel.toDouble()).color(r2, g2, b2, a2).endVertex()
+        tessellator.draw()
+
+        shadeModel(GL_FLAT)
+        disableBlend()
+        enableAlpha()
+        enableTexture2D()
+        popMatrix()
     }
 
     fun drawLoadingCircle(x: Float, y: Float) {

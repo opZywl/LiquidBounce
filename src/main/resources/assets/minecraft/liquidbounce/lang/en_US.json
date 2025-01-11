@@ -370,6 +370,8 @@
 
         "module.clickRecorder.description": "Records and saves your clicks.",
 
-        "module.chineseHat.description": "Renders a chinese-like hat on specific entities."
+        "module.chineseHat.description": "Renders a chinese-like hat on specific entities.",
+
+        "module.snakeGame.description": "The snake game for free. sniff sniff."
     }
 }
