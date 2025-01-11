@@ -382,9 +382,10 @@ open class ListValue(
     }
 }
 
-class ColorValue(
-    name: String, defaultColor: Color, var rainbow: Boolean = false, var showPicker: Boolean = false
-) : Value<Color>(name, defaultColor) {
+open class ColorValue(
+    name: String, defaultColor: Color, var rainbow: Boolean = false, var showPicker: Boolean = false,
+    isSupported: (() -> Boolean)? = null
+) : Value<Color>(name, defaultColor, isSupported = isSupported) {
     // Sliders
     var hueSliderY = 0F
     var opacitySliderY = 0F
@@ -417,7 +418,8 @@ class ColorValue(
         if (element.isJsonPrimitive) {
             val raw = element.asString
 
-            val regex = """colorpicker:\s*\[\s*(-?\d*\.?\d+),\s*(-?\d*\.?\d+)\s*],\s*hueslider:\s*(-?\d*\.?\d+),\s*opacity:\s*(-?\d*\.?\d+),\s*rainbow:\s*(true|false)""".toRegex()
+            val regex =
+                """colorpicker:\s*\[\s*(-?\d*\.?\d+),\s*(-?\d*\.?\d+)\s*],\s*hueslider:\s*(-?\d*\.?\d+),\s*opacity:\s*(-?\d*\.?\d+),\s*rainbow:\s*(true|false)""".toRegex()
             val matchResult = regex.find(raw)
 
             if (matchResult != null) {
@@ -444,7 +446,8 @@ class ColorValue(
         "Color[picker=[${colorPickerPos.x},${colorPickerPos.y}],hueslider=${hueSliderY},opacity=${(opacitySliderY)},rainbow=$rainbow]"
 
     fun readColorFromConfig(str: String): List<String>? {
-        val regex = """Color\[picker=\[\s*(-?\d*\.?\d+),\s*(-?\d*\.?\d+)],\s*hueslider=\s*(-?\d*\.?\d+),\s*opacity=\s*(-?\d*\.?\d+),\s*rainbow=(true|false)]""".toRegex()
+        val regex =
+            """Color\[picker=\[\s*(-?\d*\.?\d+),\s*(-?\d*\.?\d+)],\s*hueslider=\s*(-?\d*\.?\d+),\s*opacity=\s*(-?\d*\.?\d+),\s*rainbow=(true|false)]""".toRegex()
         val matchResult = regex.find(str)
 
         return matchResult?.let {

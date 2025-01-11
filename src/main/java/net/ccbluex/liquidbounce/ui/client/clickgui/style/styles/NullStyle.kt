@@ -373,13 +373,13 @@ object NullStyle : Style() {
                         is ColorValue -> {
                             val currentColor = value.selectedColor()
 
-                            val spacing = 10
+                            val spacing = 12
 
                             val startX = moduleElement.x + moduleElement.width + 4
                             val startY = yPos - 1
 
                             // Color preview
-                            val colorPreviewSize = 10
+                            val colorPreviewSize = 9
                             val colorPreviewX2 = maxX - colorPreviewSize
                             val colorPreviewX1 = colorPreviewX2 - colorPreviewSize
                             val colorPreviewY1 = startY + 2
@@ -406,31 +406,33 @@ object NullStyle : Style() {
                             val hueSliderStartY = colorPickerStartY
                             val hueSliderEndY = colorPickerStartY + hueSliderHeight
 
-                            if (mouseButton == 0 && mouseX in colorPreviewX1..colorPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2) {
-                                if (value.rainbow) {
-                                    value.rainbow = false
-                                } else {
-                                    value.showPicker = !value.showPicker
+                            val rainbow = value.rainbow
+
+                            if (mouseButton in arrayOf(0, 1)) {
+                                val isColorPreview = mouseX in colorPreviewX1..colorPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2
+                                val isRainbowPreview = mouseX in rainbowPreviewX1..rainbowPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2
+
+                                when {
+                                    isColorPreview -> {
+                                        if (mouseButton == 0 && rainbow) value.rainbow = false
+                                        if (mouseButton == 1) value.showPicker = !value.showPicker
+                                        clickSound()
+                                        return true
+                                    }
+                                    isRainbowPreview -> {
+                                        if (mouseButton == 0) value.rainbow = true
+                                        if (mouseButton == 1) value.showPicker = !value.showPicker
+                                        clickSound()
+                                        return true
+                                    }
                                 }
-
-                                clickSound()
-                                return true
-                            }
-
-                            if (mouseButton == 0 && mouseX in rainbowPreviewX1..rainbowPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2) {
-                                value.rainbow = true
-
-                                clickSound()
-                                return true
                             }
 
                             val display = "${value.name}: ${"#%08X".format(currentColor.rgb)}"
 
-                            moduleElement.settingsWidth = font35.getStringWidth(display) + 8
+                            moduleElement.settingsWidth = (font35.getStringWidth(display) * 1.5F).roundToInt()
 
                             font35.drawString(display, textX, textY, Color.WHITE.rgb)
-
-                            val rainbow = value.rainbow
 
                             val normalBorderColor = if (rainbow) 0 else Color.BLUE.rgb
                             val rainbowBorderColor = if (rainbow) Color.BLUE.rgb else 0
@@ -649,7 +651,7 @@ object NullStyle : Style() {
                                         return true
                                     }
                                 }
-                                yPos += colorPickerHeight - colorPreviewSize + spacing + 6
+                                yPos += colorPickerHeight + colorPreviewSize - 6
                             }
 
                             drawBorderedRect(
@@ -657,7 +659,7 @@ object NullStyle : Style() {
                                 colorPreviewY1,
                                 colorPreviewX2,
                                 colorPreviewY2,
-                                2.5f,
+                                1.5f,
                                 normalBorderColor,
                                 value.get().rgb
                             )
@@ -667,7 +669,7 @@ object NullStyle : Style() {
                                 colorPreviewY1,
                                 rainbowPreviewX2,
                                 colorPreviewY2,
-                                2.5f,
+                                1.5f,
                                 rainbowBorderColor,
                                 ColorUtils.rainbow(alpha = value.opacitySliderY).rgb
                             )

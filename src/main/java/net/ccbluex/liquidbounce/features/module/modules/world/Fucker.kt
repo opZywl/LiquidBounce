@@ -78,6 +78,8 @@ object Fucker : Module("Fucker", Category.WORLD, hideModule = false) {
 
     private val testsuperwow by ColorValue("SuperWow", Color.CYAN, false, false)
 
+    private val testsuperwow2 by ColorValue("SuperExtraColorLongName", Color.CYAN, false, false) { ignoreOwnBed }
+
     /**
      * VALUES
      */
