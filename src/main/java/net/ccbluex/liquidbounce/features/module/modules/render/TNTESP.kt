@@ -29,8 +29,7 @@ object TNTESP : Module("TNTESP", Category.RENDER, spacedName = "TNT ESP", hideMo
     private val mode by choices("Mode", arrayOf("Lines", "Triangles", "Filled"), "Lines") { dangerZoneDome }
     private val lineWidth by float("LineWidth", 1F, 0.5F..5F) { mode == "Lines" }
     private val rainbow by boolean("Rainbow", false) { dangerZoneDome }
-    private val colors = ColorSettingsInteger(this, "Dome", alphaApply = { dangerZoneDome })
-    { !rainbow && dangerZoneDome }
+    private val colors = ColorSettingsInteger(this, "Dome") { !rainbow && dangerZoneDome }
 
     private val renderModes = mapOf("Lines" to GL_LINES, "Triangles" to GL_TRIANGLES, "Filled" to GL_QUADS)
 

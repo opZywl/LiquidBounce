@@ -31,8 +31,7 @@ object ForwardTrack : Module("ForwardTrack", Category.COMBAT) {
     private val wireframeWidth by float("WireFrame-Width", 1f, 0.5f..5f) { espMode == "WireFrame" }
 
     private val espColorMode by choices("ESP-Color", arrayOf("Custom", "Rainbow"), "Custom") { espMode != "Model" }
-    private val espColor = ColorSettingsInteger(this, "ESP", withAlpha = false)
-    { espColorMode == "Custom" && espMode != "Model" }.with(0, 255, 0)
+    private val espColor = ColorSettingsInteger(this, "ESP") { espColorMode == "Custom" && espMode != "Model" }.with(0, 255, 0)
 
     val color
         get() = if (espColorMode == "Rainbow") rainbow() else Color(espColor.color().rgb)

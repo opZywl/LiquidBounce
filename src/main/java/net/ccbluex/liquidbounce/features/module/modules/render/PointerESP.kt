@@ -33,11 +33,11 @@ object PointerESP : Module("PointerESP", Category.RENDER, hideModule = false) {
 
     private val colorMode by choices("Color-Mode", arrayOf("Custom", "Rainbow"), "Custom")
     { healthMode == "None" }
-    private val colors = ColorSettingsInteger(this, "Colors", withAlpha = false)
+    private val colors = ColorSettingsInteger(this, "Colors")
     { colorMode == "Custom" && healthMode == "None" }.with(255, 111, 255)
 
     private val healthMode by choices("Health-Mode", arrayOf("None", "Custom"), "Custom")
-    private val healthColors = ColorSettingsInteger(this, "Health", withAlpha = false)
+    private val healthColors = ColorSettingsInteger(this, "Health")
     { healthMode == "Custom" }.with(255, 255, 0)
 
     private val absorption by boolean("Absorption", true) { healthMode == "Custom" }

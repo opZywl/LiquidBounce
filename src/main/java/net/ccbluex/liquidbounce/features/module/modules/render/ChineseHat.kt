@@ -37,7 +37,7 @@ object ChineseHat : Module("ChineseHat", Category.RENDER) {
     private val useChineseHatTexture by boolean("UseChineseHatTexture", false)
 
     private val colorMode by choices("Color", arrayOf("Custom", "DistanceColor", "Rainbow"), "Custom")
-    private val colors = ColorSettingsInteger(this, zeroAlphaCheck = true, alphaApply = { true }) { colorMode == "Custom" }.with(0, 160, 255, 150)
+    private val colors = ColorSettingsInteger(this) { colorMode == "Custom" }.with(0, 160, 255, 150)
 
     private val playerHeight by float("PlayerHeight", 0.5f, 0.25f..2f)
 

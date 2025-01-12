@@ -53,7 +53,7 @@ object ESP : Module("ESP", Category.RENDER, hideModule = false) {
     private val glowTargetAlpha by float("Glow-Target-Alpha", 0f, 0f..1f) { mode == "Glow" }
 
     private val espColorMode by choices("ESP-Color", arrayOf("Custom", "Rainbow"), "Custom")
-    private val espColor = ColorSettingsInteger(this, "ESP", withAlpha = false)
+    private val espColor = ColorSettingsInteger(this, "ESP")
     { espColorMode in arrayOf("Custom", "Gaussian") }.with(255, 255, 255)
 
     private val maxRenderDistance by object : IntegerValue("MaxRenderDistance", 100, 1..200) {

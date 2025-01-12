@@ -112,12 +112,7 @@ class Text(x: Double = 10.0, y: Double = 10.0, scale: Float = 1F, side: Side = S
 
     private val textColorMode by choices("Text-Color", arrayOf("Custom", "Rainbow", "Gradient"), "Custom")
 
-    private val colors = ColorSettingsInteger(
-        this,
-        zeroAlphaCheck = true,
-        alphaApply = { textColorMode != "Rainbow" },
-        applyMax = true
-    ) { textColorMode == "Custom" }
+    private val colors = ColorSettingsInteger(this, applyMax = true) { textColorMode == "Custom" }
 
     private val gradientTextSpeed by float("Text-Gradient-Speed", 1f, 0.5f..10f) { textColorMode == "Gradient" }
 
@@ -132,7 +127,7 @@ class Text(x: Double = 10.0, y: Double = 10.0, scale: Float = 1F, side: Side = S
 
     private val backgroundMode by choices("Background-Color", arrayOf("Custom", "Rainbow", "Gradient"), "Custom")
 
-    private val bgColors = ColorSettingsInteger(this, "Background", zeroAlphaCheck = true)
+    private val bgColors = ColorSettingsInteger(this, "Background")
     { backgroundMode == "Custom" }.with(a = 0)
 
     private val gradientBackgroundSpeed by float("Background-Gradient-Speed", 1f, 0.5f..10f)
@@ -145,7 +140,7 @@ class Text(x: Double = 10.0, y: Double = 10.0, scale: Float = 1F, side: Side = S
 
     private val backgroundBorder by float("BackgroundBorder-Width", 0.5F, 0.5F..5F)
 
-    private val bgBorderColors = ColorSettingsInteger(this, "BackgroundBorder", zeroAlphaCheck = true).with(a = 0)
+    private val bgBorderColors = ColorSettingsInteger(this, "BackgroundBorder").with(a = 0)
 
     private fun isColorModeUsed(value: String) = textColorMode == value || backgroundMode == value
 
@@ -153,9 +148,6 @@ class Text(x: Double = 10.0, y: Double = 10.0, scale: Float = 1F, side: Side = S
     private val rainbowY by float("Rainbow-Y", -1000F, -2000F..2000F) { isColorModeUsed("Rainbow") }
     private val gradientX by float("Gradient-X", -500F, -2000F..2000F) { isColorModeUsed("Gradient") }
     private val gradientY by float("Gradient-Y", -1500F, -2000F..2000F) { isColorModeUsed("Gradient") }
-
-    private val colorvalue = ColorValue("SuperWow", Color.CYAN)
-    private val colorval = ColorValue("SuperWowTestLong", Color.WHITE)
 
     private var shadow by boolean("Shadow", true)
     private val font by font("Font", Fonts.font40)

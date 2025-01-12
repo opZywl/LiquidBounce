@@ -80,17 +80,11 @@ object Backtrack : Module("Backtrack", Category.COMBAT, hideModule = false) {
     private val smart by boolean("Smart", true) { mode == "Modern" }
 
     // ESP
-    private val espMode by choices(
-        "ESP-Mode", arrayOf("None", "Box", "Model", "Wireframe"), "Box", subjective = true
-    ) { mode == "Modern" }
+    private val espMode by choices("ESP-Mode", arrayOf("None", "Box", "Model", "Wireframe"), "Box", subjective = true) { mode == "Modern" }
     private val wireframeWidth by float("WireFrame-Width", 1f, 0.5f..5f) { espMode == "WireFrame" }
 
-    private val espColorMode by choices(
-        "ESP-Color", arrayOf("Custom", "Rainbow"), "Custom"
-    ) { espMode != "Model" && mode == "Modern" }
-    private val espColor = ColorSettingsInteger(
-        this, "ESP", withAlpha = false
-    ) { espColorMode == "Custom" && espMode != "Model" && mode == "Modern" }.with(0, 255, 0)
+    private val espColorMode by choices("ESP-Color", arrayOf("Custom", "Rainbow"), "Custom") { espMode != "Model" && mode == "Modern" }
+    private val espColor = ColorSettingsInteger(this, "ESP") { espColorMode == "Custom" && espMode != "Model" && mode == "Modern" }.with(0, 255, 0)
 
     private val packetQueue = ConcurrentLinkedQueue<QueueData>()
     private val positions = mutableListOf<Pair<Vec3, Long>>()

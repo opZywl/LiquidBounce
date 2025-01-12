@@ -23,7 +23,7 @@ import java.awt.Color
 
 object Breadcrumbs : Module("Breadcrumbs", Category.RENDER, hideModule = false) {
     val rainbow by boolean("Rainbow", false)
-    val colors = ColorSettingsInteger(this, "Color", withAlpha = false) { !rainbow }.with(132, 102, 255)
+    val colors = ColorSettingsInteger(this, "Color") { !rainbow }.with(132, 102, 255)
     private val lineHeight by float("LineHeight", 0.25F, 0.25F..2F)
     private val temporary by boolean("Temporary", true)
     private val fade by boolean("Fade", true) { temporary }
