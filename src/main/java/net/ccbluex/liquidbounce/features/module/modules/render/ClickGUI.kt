@@ -35,7 +35,7 @@ object ClickGUI : Module("ClickGUI", Category.RENDER, Keyboard.KEY_RSHIFT, canBe
     private val color by color("Color", Color(0, 160, 255)) { style !in arrayOf("Slowly", "Black") }
 
     val guiColor
-        get() = color
+        get() = color.rgb
 
     override fun onEnable() {
         updateStyle()
