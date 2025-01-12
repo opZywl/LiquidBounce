@@ -132,7 +132,7 @@ object SettingsUtils {
     // Utility functions for setting toggles
     private fun setToggle(module: Module, value: String) {
         module.state = value.equals("true", ignoreCase = true)
-        //chat("§7[§3§lAutoSettings§7] §a§l${module.getName()} §7was toggled §c§l${if (module.state) "on" else "off"}§7.")
+        chat("§7[§3§lAutoSettings§7] §a§l${module.getName()} §7was toggled §c§l${if (module.state) "on" else "off"}§7.")
     }
 
     // Utility functions for setting binds
@@ -172,6 +172,7 @@ object SettingsUtils {
                         } else (moduleValue as FloatRangeValue).changeValue(min..max)
                     }
                 }
+
                 is ColorValue -> {
                     moduleValue.readColorFromConfig(value)?.let { list ->
                         val pos = list[0].toFloatOrNull() to list[1].toFloatOrNull()
@@ -200,7 +201,7 @@ object SettingsUtils {
                 }
             }
 
-           // chat("§7[§3§lAutoSettings§7] §a§l${module.getName()}§7 value §8§l${moduleValue.name}§7 set to §c§l$value§7.")
+            chat("§7[§3§lAutoSettings§7] §a§l${module.getName()}§7 value §8§l${moduleValue.name}§7 set to §c§l$value§7.")
         } catch (e: Exception) {
             chat("§7[§3§lAutoSettings§7] §a§l${e.javaClass.name}§7(${e.message}) §cAn Exception occurred while setting §a§l$value§c to §a§l${moduleValue.name}§c in §a§l${module.getName()}§c.")
         }

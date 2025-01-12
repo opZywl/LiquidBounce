@@ -396,6 +396,8 @@ object NullStyle : Style() {
                             val colorPickerWidth = 75
                             val colorPickerHeight = 50
 
+                            val spacingBetweenSliders = 5
+
                             val colorPickerStartX = textX.toInt()
                             val colorPickerEndX = colorPickerStartX + colorPickerWidth
                             val colorPickerStartY = colorPreviewY2 + spacing / 3
@@ -403,6 +405,11 @@ object NullStyle : Style() {
 
                             val hueSliderStartY = colorPickerStartY
                             val hueSliderEndY = colorPickerStartY + hueSliderHeight
+
+                            val hueSliderX = colorPickerEndX + spacingBetweenSliders
+
+                            val opacityStartX = hueSliderX + hueSliderWidth + spacingBetweenSliders
+                            val opacityEndX = opacityStartX + hueSliderWidth
 
                             val rainbow = value.rainbow
 
@@ -431,7 +438,10 @@ object NullStyle : Style() {
 
                             val display = "${value.name}: ${"#%08X".format(currentColor.rgb)}"
 
-                            moduleElement.settingsWidth = (font35.getStringWidth(display) * 1.5F).roundToInt()
+                            val combinedWidth = opacityEndX - colorPickerStartX
+                            val optimalWidth = maxOf(font35.getStringWidth(display), combinedWidth)
+
+                            moduleElement.settingsWidth = optimalWidth + spacing * 4
 
                             font35.drawString(display, textX, textY, Color.WHITE.rgb)
 
@@ -480,8 +490,6 @@ object NullStyle : Style() {
                                     )
                                 }
 
-                                val hueSliderX = colorPickerEndX + 5
-
                                 // Hue slider
                                 value.updateTextureCache(
                                     id = 1,
@@ -502,9 +510,6 @@ object NullStyle : Style() {
                                             id, hueSliderX, colorPickerStartY, hueSliderWidth, hueSliderHeight
                                         )
                                     })
-
-                                val opacityStartX = hueSliderX + hueSliderWidth + 5
-                                val opacityEndX = opacityStartX + hueSliderWidth
 
                                 // Opacity slider
                                 value.updateTextureCache(

@@ -520,6 +520,8 @@ class EditorPanel(private val hudDesigner: GuiHudDesigner, var x: Int, var y: In
                     val colorPickerWidth = 75
                     val colorPickerHeight = 50
 
+                    val spacingBetweenSliders = 5
+
                     val colorPickerStartX = textX.toInt()
                     val colorPickerEndX = colorPickerStartX + colorPickerWidth
                     val colorPickerStartY = colorPreviewY2 + spacing / 3
@@ -527,6 +529,11 @@ class EditorPanel(private val hudDesigner: GuiHudDesigner, var x: Int, var y: In
 
                     val hueSliderStartY = colorPickerStartY
                     val hueSliderEndY = colorPickerStartY + hueSliderHeight
+
+                    val hueSliderX = colorPickerEndX + spacingBetweenSliders
+
+                    val opacityStartX = hueSliderX + hueSliderWidth + spacingBetweenSliders
+                    val opacityEndX = opacityStartX + hueSliderWidth
 
                     val rainbow = value.rainbow
 
@@ -597,8 +604,6 @@ class EditorPanel(private val hudDesigner: GuiHudDesigner, var x: Int, var y: In
                             )
                         }
 
-                        val hueSliderX = colorPickerEndX + 5
-
                         // Hue slider
                         value.updateTextureCache(
                             id = 1,
@@ -619,9 +624,6 @@ class EditorPanel(private val hudDesigner: GuiHudDesigner, var x: Int, var y: In
                                     id, hueSliderX, colorPickerStartY, hueSliderWidth, hueSliderHeight
                                 )
                             })
-
-                        val opacityStartX = hueSliderX + hueSliderWidth + 5
-                        val opacityEndX = opacityStartX + hueSliderWidth
 
                         // Opacity slider
                         value.updateTextureCache(
