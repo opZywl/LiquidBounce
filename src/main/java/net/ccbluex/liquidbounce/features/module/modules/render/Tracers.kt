@@ -16,7 +16,6 @@ import net.ccbluex.liquidbounce.utils.attack.EntityUtils.isLookingOnEntities
 import net.ccbluex.liquidbounce.utils.attack.EntityUtils.isSelected
 import net.ccbluex.liquidbounce.utils.client.EntityLookup
 import net.ccbluex.liquidbounce.utils.extensions.*
-import net.ccbluex.liquidbounce.utils.render.ColorUtils
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.glColor
 import net.ccbluex.liquidbounce.utils.rotation.RotationUtils.isEntityHeightVisible
 import net.minecraft.entity.Entity
@@ -29,7 +28,7 @@ import kotlin.math.pow
 
 object Tracers : Module("Tracers", Category.RENDER, hideModule = false) {
 
-    private val colorMode by choices("Color", arrayOf("Custom", "DistanceColor", "Rainbow"), "Custom")
+    private val colorMode by choices("Color", arrayOf("Custom", "DistanceColor"), "Custom")
     private val color by color("Color", Color(0, 160, 255, 150)) { colorMode == "Custom" }
 
     private val thickness by float("Thickness", 2F, 1F..5F)
@@ -91,7 +90,6 @@ object Tracers : Module("Tracers", Category.RENDER, hideModule = false) {
                     teams && Teams.handleEvents() && Teams.isInYourTeam(entity) -> Color(0, 162, 232)
                     colorMode == "custom" -> color
                     colorMode == "distancecolor" -> Color(255 - dist, dist, 0, 150)
-                    colorMode == "rainbow" -> ColorUtils.rainbow()
                     else -> Color(255, 255, 255, 150)
                 }
 

@@ -43,8 +43,7 @@ class ScoreboardElement(
     private val roundedRectRadius by float("Rounded-Radius", 3F, 0F..5F)
 
     private val rect by boolean("Rect", false)
-    private val rectColorMode by choices("Rect-Color", arrayOf("Custom", "Rainbow"), "Custom") { rect }
-    private val rectColor by color("RectangleColor", Color(0, 111, 255)) { rect && rectColorMode == "Custom" }
+    private val rectColor = color("RectangleColor", Color(0, 111, 255)) { rect }
 
     private val serverIp by choices("ServerIP", arrayOf("Normal", "None", "Client", "Website"), "Normal")
     private val number by boolean("Number", true)
@@ -61,9 +60,6 @@ class ScoreboardElement(
             val (fontRenderer, fontHeight) = font to ((font as? GameFontRenderer)?.height ?: font.FONT_HEIGHT)
             val textColor = textColor.rgb
             val backColor = backgroundColor.rgb
-
-            val rectColorMode = rectColorMode
-            val rectColorRGB = rectColor.rgb
 
             val worldScoreboard = mc.theWorld.scoreboard ?: return null
             var currObjective: ScoreObjective? = null
@@ -171,9 +167,9 @@ class ScoreboardElement(
                 }
 
                 if (rect) {
-                    val rectColor = when (rectColorMode) {
-                        "Rainbow" -> ColorUtils.rainbow(400000000L * index).rgb
-                        else -> rectColorRGB
+                    val rectColor = when {
+                        this.rectColor.rainbow -> ColorUtils.rainbow(400000000L * index).rgb
+                        else -> this.rectColor.selectedColor().rgb
                     }
 
                     drawRoundedRect(
