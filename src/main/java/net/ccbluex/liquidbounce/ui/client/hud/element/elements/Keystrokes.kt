@@ -88,7 +88,11 @@ class Keystrokes : Element(2.0, 123.0) {
             val textX = (startX + endX) / 2 - (font.getStringWidth(key) / 2)
             val textY = currentY + (boxSize / 2) - (fontHeight / 2)
 
-            font.drawString(key, textX, textY, textColor.rgb, shadow)
+            if (font == mc.fontRendererObj) {
+                font.drawString(key, textX, textY, textColor.rgb, shadow)
+            } else {
+                (font as GameFontRenderer).drawString(key, textX, textY + 2f, textColor.rgb, shadow)
+            }
         }
 
         return Border(0F, boxSize + padding, boxSize * 3 + padding * 2, boxSize * 4 + padding * 3)
