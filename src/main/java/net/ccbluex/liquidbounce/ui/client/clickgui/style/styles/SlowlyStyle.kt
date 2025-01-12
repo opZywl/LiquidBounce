@@ -25,6 +25,8 @@ import net.ccbluex.liquidbounce.utils.render.RenderUtils
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawBorderedRect
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawFilledCircle
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawRect
+import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawTexture
+import net.ccbluex.liquidbounce.utils.render.RenderUtils.updateTextureCache
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.util.StringUtils
 import net.minecraftforge.fml.relauncher.Side
@@ -324,11 +326,17 @@ object SlowlyStyle : Style() {
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
                                     withDelayedSave {
-                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                        value.setFirst(
+                                            value.lerpWith(percentage).coerceIn(value.minimum, slider2),
+                                            false
+                                        )
                                     }
                                 } else {
                                     withDelayedSave {
-                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                        value.setLast(
+                                            value.lerpWith(percentage).coerceIn(slider1, value.maximum),
+                                            false
+                                        )
                                     }
                                 }
 
@@ -381,11 +389,17 @@ object SlowlyStyle : Style() {
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
                                     withDelayedSave {
-                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                        value.setFirst(
+                                            value.lerpWith(percentage).coerceIn(value.minimum, slider2),
+                                            false
+                                        )
                                     }
                                 } else {
                                     withDelayedSave {
-                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                        value.setLast(
+                                            value.lerpWith(percentage).coerceIn(slider1, value.maximum),
+                                            false
+                                        )
                                     }
                                 }
 
@@ -470,8 +484,10 @@ object SlowlyStyle : Style() {
                             val rainbow = value.rainbow
 
                             if (mouseButton in arrayOf(0, 1)) {
-                                val isColorPreview = mouseX in colorPreviewX1..colorPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2
-                                val isRainbowPreview = mouseX in rainbowPreviewX1..rainbowPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2
+                                val isColorPreview =
+                                    mouseX in colorPreviewX1..colorPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2
+                                val isRainbowPreview =
+                                    mouseX in rainbowPreviewX1..rainbowPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2
 
                                 when {
                                     isColorPreview -> {
@@ -480,6 +496,7 @@ object SlowlyStyle : Style() {
                                         clickSound()
                                         return true
                                     }
+
                                     isRainbowPreview -> {
                                         if (mouseButton == 0) value.rainbow = true
                                         if (mouseButton == 1) value.showPicker = !value.showPicker

@@ -400,7 +400,11 @@ open class ColorValue(
         }
 
     init {
-        changeValue(defaultColor)
+        Color.RGBtoHSB(defaultColor.red, defaultColor.green, defaultColor.blue, null).also {
+            hueSliderY = it[0]
+            opacitySliderY = defaultColor.alpha / 255f
+            colorPickerPos.set(it[1], 1 - it[2])
+        }
     }
 
     fun selectedColor() = if (rainbow) {

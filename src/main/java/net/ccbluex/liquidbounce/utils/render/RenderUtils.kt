@@ -5,6 +5,7 @@
  */
 package net.ccbluex.liquidbounce.utils.render
 
+import net.ccbluex.liquidbounce.config.ColorValue
 import net.ccbluex.liquidbounce.ui.font.Fonts
 import net.ccbluex.liquidbounce.utils.block.block
 import net.ccbluex.liquidbounce.utils.block.center
@@ -22,8 +23,12 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.*
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.*
+import org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE
 import org.lwjgl.opengl.GL14
 import java.awt.Color
+import java.awt.Graphics2D
+import java.awt.image.BufferedImage
+import java.nio.ByteBuffer
 import kotlin.math.*
 
 object RenderUtils : MinecraftInstance {
@@ -1174,5 +1179,104 @@ object RenderUtils : MinecraftInstance {
         pos((x + width).toDouble(), y.toDouble(), 0.0).tex(((u + uWidth.toFloat()) * f).toDouble(), (v * f1).toDouble())
             .endVertex()
         pos(x.toDouble(), y.toDouble(), 0.0).tex((u * f).toDouble(), (v * f1).toDouble()).endVertex()
+    }
+
+    data class ColorValueCache(val lastHue: Float, val cachedTextureID: Int)
+
+    private val colorValueCache: MutableMap<ColorValue, MutableMap<Int, ColorValueCache>> = mutableMapOf()
+
+    fun ColorValue.updateTextureCache(
+        id: Int, hue: Float, width: Int, height: Int, generateImage: (BufferedImage, Graphics2D) -> Unit,
+        drawAt: (Int) -> Unit
+    ) {
+        val cached = colorValueCache[this]?.get(id)
+        val lastHue = cached?.lastHue
+
+        if (lastHue == null || lastHue != hue) {
+            val image = createRGBImageDrawing(width, height) { img, graphics -> generateImage(img, graphics) }
+            val texture = convertImageToTexture(image)
+            colorValueCache.getOrPut(this, ::mutableMapOf)[id] = ColorValueCache(hue, texture)
+        }
+
+        colorValueCache[this]?.get(id)?.cachedTextureID?.let(drawAt)
+    }
+
+    private fun createRGBImageDrawing(width: Int, height: Int, f: (BufferedImage, Graphics2D) -> Unit): BufferedImage {
+        val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+        val g = image.createGraphics()
+
+        f(image, g)
+
+        g.dispose()
+        return image
+    }
+
+    private fun convertImageToTexture(image: BufferedImage): Int {
+        val width = image.width
+        val height = image.height
+
+        val pixels = IntArray(width * height)
+
+        image.getRGB(0, 0, width, height, pixels, 0, width)
+
+        val buffer = ByteBuffer.allocateDirect(width * height * 4)
+
+        for (i in pixels.indices) {
+            val pixel = pixels[i]
+            buffer.put(((pixel shr 16) and 0xFF).toByte())
+            buffer.put(((pixel shr 8) and 0xFF).toByte())
+            buffer.put(((pixel shr 0) and 0xFF).toByte())
+            buffer.put(((pixel shr 24) and 0xFF).toByte())
+        }
+
+        buffer.flip()
+
+        val textureID = glGenTextures()
+
+        glPushAttrib(GL_ALL_ATTRIB_BITS)
+        glPushMatrix()
+
+        glBindTexture(GL_TEXTURE_2D, textureID)
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer)
+
+        glPopMatrix()
+        glPopAttrib()
+
+        return textureID
+    }
+
+    fun drawTexture(textureID: Int, x: Int, y: Int, width: Int, height: Int) {
+        glPushAttrib(GL_ALL_ATTRIB_BITS)
+        glPushMatrix()
+
+        glEnable(GL_TEXTURE_2D)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glEnable(GL_ALPHA_TEST)
+        glAlphaFunc(GL_GREATER, 0f)
+
+        glBindTexture(GL_TEXTURE_2D, textureID)
+
+        glTranslatef(x.toFloat(), y.toFloat(), 0.0f)
+
+        glBegin(GL_QUADS)
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f) // Bottom-left corner
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(width.toFloat(), 0.0f) // Bottom-right corner
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(width.toFloat(), height.toFloat()) // Top-right corner
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, height.toFloat()) // Top-left corner
+        glEnd()
+
+        glDisable(GL_TEXTURE_2D)
+        glDisable(GL_BLEND)
+        glDisable(GL_ALPHA_TEST)
+
+        glPopMatrix()
+        glPopAttrib()
     }
 }

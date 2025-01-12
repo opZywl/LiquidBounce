@@ -13,7 +13,6 @@ import net.ccbluex.liquidbounce.ui.client.clickgui.Panel
 import net.ccbluex.liquidbounce.ui.client.clickgui.elements.ButtonElement
 import net.ccbluex.liquidbounce.ui.client.clickgui.elements.ModuleElement
 import net.ccbluex.liquidbounce.ui.client.clickgui.style.Style
-import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.LiquidBounceStyle.setAndSaveValueOnButtonRelease
 import net.ccbluex.liquidbounce.ui.font.AWTFontRenderer.Companion.assumeNonVolatile
 import net.ccbluex.liquidbounce.ui.font.Fonts.font35
 import net.ccbluex.liquidbounce.utils.block.BlockUtils.getBlockName
@@ -26,6 +25,8 @@ import net.ccbluex.liquidbounce.utils.render.ColorUtils.withAlpha
 import net.ccbluex.liquidbounce.utils.render.RenderUtils
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawBorderedRect
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawRect
+import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawTexture
+import net.ccbluex.liquidbounce.utils.render.RenderUtils.updateTextureCache
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.util.StringUtils
 import net.minecraftforge.fml.relauncher.Side
@@ -40,16 +41,9 @@ object NullStyle : Style() {
     override fun drawPanel(mouseX: Int, mouseY: Int, panel: Panel) {
         drawRect(panel.x - 3, panel.y, panel.x + panel.width + 3, panel.y + 19, guiColor)
 
-        if (panel.fade > 0)
-            drawBorderedRect(
-                panel.x,
-                panel.y + 19,
-                panel.x + panel.width,
-                panel.y + 19 + panel.fade,
-                1,
-                Int.MIN_VALUE,
-                Int.MIN_VALUE
-            )
+        if (panel.fade > 0) drawBorderedRect(
+            panel.x, panel.y + 19, panel.x + panel.width, panel.y + 19 + panel.fade, 1, Int.MIN_VALUE, Int.MIN_VALUE
+        )
 
         val xPos = panel.x - (font35.getStringWidth("§f" + StringUtils.stripControlCodes(panel.name)) - 100) / 2
         font35.drawString(panel.name, xPos, panel.y + 7, getNegatedColor())
@@ -79,17 +73,11 @@ object NullStyle : Style() {
     }
 
     override fun drawModuleElementAndClick(
-        mouseX: Int,
-        mouseY: Int,
-        moduleElement: ModuleElement,
-        mouseButton: Int?
+        mouseX: Int, mouseY: Int, moduleElement: ModuleElement, mouseButton: Int?
     ): Boolean {
         val xPos = moduleElement.x - (font35.getStringWidth(moduleElement.displayName) - 100) / 2
         font35.drawString(
-            moduleElement.displayName,
-            xPos,
-            moduleElement.y + 6,
-            if (moduleElement.module.state) {
+            moduleElement.displayName, xPos, moduleElement.y + 6, if (moduleElement.module.state) {
                 if (moduleElement.module.isActive) guiColor
                 // Make inactive modules have alpha set to 100
                 else (guiColor and 0x00FFFFFF) or (0x64 shl 24)
@@ -100,7 +88,9 @@ object NullStyle : Style() {
         if (moduleValues.isNotEmpty()) {
             font35.drawString(
                 if (moduleElement.showSettings) "-" else "+",
-                moduleElement.x + moduleElement.width - 8, moduleElement.y + moduleElement.height / 2, Color.WHITE.rgb
+                moduleElement.x + moduleElement.width - 8,
+                moduleElement.y + moduleElement.height / 2,
+                Color.WHITE.rgb
             )
 
             if (moduleElement.showSettings) {
@@ -110,13 +100,7 @@ object NullStyle : Style() {
                 val maxX = moduleElement.x + moduleElement.width + moduleElement.settingsWidth
 
                 if (moduleElement.settingsWidth > 0 && moduleElement.settingsHeight > 0) drawBorderedRect(
-                    minX,
-                    yPos,
-                    maxX,
-                    yPos + moduleElement.settingsHeight,
-                    1,
-                    0,
-                    Int.MIN_VALUE
+                    minX, yPos, maxX, yPos + moduleElement.settingsHeight, 1, 0, Int.MIN_VALUE
                 )
 
                 for (value in moduleValues) {
@@ -130,18 +114,14 @@ object NullStyle : Style() {
 
                             moduleElement.settingsWidth = font35.getStringWidth(text) + 8
 
-                            if (mouseButton == 0
-                                && mouseX in minX..maxX
-                                && mouseY in yPos + 2..yPos + 14
-                            ) {
+                            if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 2..yPos + 14) {
                                 value.toggle()
                                 clickSound()
                                 return true
                             }
 
                             font35.drawString(
-                                text, minX + 2, yPos + 4,
-                                if (value.get()) guiColor else Int.MAX_VALUE
+                                text, minX + 2, yPos + 4, if (value.get()) guiColor else Int.MAX_VALUE
                             )
 
                             yPos += 12
@@ -152,10 +132,7 @@ object NullStyle : Style() {
 
                             moduleElement.settingsWidth = font35.getStringWidth(text) + 16
 
-                            if (mouseButton == 0
-                                && mouseX in minX..maxX
-                                && mouseY in yPos + 2..yPos + 14
-                            ) {
+                            if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 2..yPos + 14) {
                                 value.openList = !value.openList
                                 clickSound()
                                 return true
@@ -164,7 +141,9 @@ object NullStyle : Style() {
                             font35.drawString("§c$text", minX + 2, yPos + 4, Color.WHITE.rgb)
                             font35.drawString(
                                 if (value.openList) "-" else "+",
-                                (maxX - if (value.openList) 5 else 6), yPos + 4, Color.WHITE.rgb
+                                (maxX - if (value.openList) 5 else 6),
+                                yPos + 4,
+                                Color.WHITE.rgb
                             )
 
                             yPos += 12
@@ -173,21 +152,22 @@ object NullStyle : Style() {
                                 moduleElement.settingsWidth = font35.getStringWidth(valueOfList) + 16
 
                                 if (value.openList) {
-                                    if (mouseButton == 0
-                                        && mouseX in minX..maxX
-                                        && mouseY in yPos + 2..yPos + 14
-                                    ) {
+                                    if (mouseButton == 0 && mouseX in minX..maxX && mouseY in yPos + 2..yPos + 14) {
                                         value.set(valueOfList)
                                         clickSound()
                                         return true
                                     }
 
                                     font35.drawString(
-                                        ">", minX + 2, yPos + 4,
+                                        ">",
+                                        minX + 2,
+                                        yPos + 4,
                                         if (value.get() == valueOfList) guiColor else Int.MAX_VALUE
                                     )
                                     font35.drawString(
-                                        valueOfList, minX + 10, yPos + 4,
+                                        valueOfList,
+                                        minX + 10,
+                                        yPos + 4,
                                         if (value.get() == valueOfList) guiColor else Int.MAX_VALUE
                                     )
 
@@ -276,11 +256,15 @@ object NullStyle : Style() {
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
                                     withDelayedSave {
-                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                        value.setFirst(
+                                            value.lerpWith(percentage).coerceIn(value.minimum, slider2), false
+                                        )
                                     }
                                 } else {
                                     withDelayedSave {
-                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                        value.setLast(
+                                            value.lerpWith(percentage).coerceIn(slider1, value.maximum), false
+                                        )
                                     }
                                 }
 
@@ -330,11 +314,15 @@ object NullStyle : Style() {
 
                                 if (abs(distToSlider1) <= abs(distToSlider2) && distToSlider2 <= 0) {
                                     withDelayedSave {
-                                        value.setFirst(value.lerpWith(percentage).coerceIn(value.minimum, slider2), false)
+                                        value.setFirst(
+                                            value.lerpWith(percentage).coerceIn(value.minimum, slider2), false
+                                        )
                                     }
                                 } else {
                                     withDelayedSave {
-                                        value.setLast(value.lerpWith(percentage).coerceIn(slider1, value.maximum), false)
+                                        value.setLast(
+                                            value.lerpWith(percentage).coerceIn(slider1, value.maximum), false
+                                        )
                                     }
                                 }
 
@@ -367,10 +355,7 @@ object NullStyle : Style() {
                             val displayString = value.displayName
                             moduleElement.settingsWidth = font35.getStringWidth(displayString) + 8
 
-                            if (mouseButton != null
-                                && mouseX in minX..maxX
-                                && mouseY in yPos + 4..yPos + 12
-                            ) {
+                            if (mouseButton != null && mouseX in minX..maxX && mouseY in yPos + 4..yPos + 12) {
                                 // Cycle to next font when left-clicked, previous when right-clicked.
                                 if (mouseButton == 0) value.next()
                                 else value.previous()
@@ -422,8 +407,10 @@ object NullStyle : Style() {
                             val rainbow = value.rainbow
 
                             if (mouseButton in arrayOf(0, 1)) {
-                                val isColorPreview = mouseX in colorPreviewX1..colorPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2
-                                val isRainbowPreview = mouseX in rainbowPreviewX1..rainbowPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2
+                                val isColorPreview =
+                                    mouseX in colorPreviewX1..colorPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2
+                                val isRainbowPreview =
+                                    mouseX in rainbowPreviewX1..rainbowPreviewX2 && mouseY in colorPreviewY1..colorPreviewY2
 
                                 when {
                                     isColorPreview -> {
@@ -432,6 +419,7 @@ object NullStyle : Style() {
                                         clickSound()
                                         return true
                                     }
+
                                     isRainbowPreview -> {
                                         if (mouseButton == 0) value.rainbow = true
                                         if (mouseButton == 1) value.showPicker = !value.showPicker
@@ -511,11 +499,7 @@ object NullStyle : Style() {
                                     },
                                     drawAt = { id ->
                                         drawTexture(
-                                            id,
-                                            hueSliderX,
-                                            colorPickerStartY,
-                                            hueSliderWidth,
-                                            hueSliderHeight
+                                            id, hueSliderX, colorPickerStartY, hueSliderWidth, hueSliderHeight
                                         )
                                     })
 
@@ -546,8 +530,7 @@ object NullStyle : Style() {
                                                     ((1 - y.toFloat() / hueSliderHeight.toFloat()) * 255).roundToInt()
 
                                                 val finalColor = blendColors(
-                                                    Color(checkerboardColor),
-                                                    currentColor.withAlpha(alpha)
+                                                    Color(checkerboardColor), currentColor.withAlpha(alpha)
                                                 )
 
                                                 image.setRGB(x, y, finalColor.rgb)
@@ -556,16 +539,11 @@ object NullStyle : Style() {
                                     },
                                     drawAt = { id ->
                                         drawTexture(
-                                            id,
-                                            opacityStartX,
-                                            colorPickerStartY,
-                                            hueSliderWidth,
-                                            hueSliderHeight
+                                            id, opacityStartX, colorPickerStartY, hueSliderWidth, hueSliderHeight
                                         )
                                     })
 
-                                val opacityMarkerY =
-                                    (hueSliderStartY..hueSliderEndY).lerpWith(1 - value.opacitySliderY)
+                                val opacityMarkerY = (hueSliderStartY..hueSliderEndY).lerpWith(1 - value.opacitySliderY)
                                 val hueMarkerY = (hueSliderStartY..hueSliderEndY).lerpWith(hue)
 
                                 RenderUtils.drawBorder(
@@ -597,19 +575,14 @@ object NullStyle : Style() {
                                 // If it's inside the statement, it will not update the mouse button state on time.
                                 val sliderType = value.lastChosenSlider
 
-                                if (mouseButton == 0 && (inColorPicker || inHueSlider || inOpacitySlider)
-                                    || sliderValueHeld == value && value.lastChosenSlider != null
-                                ) {
+                                if (mouseButton == 0 && (inColorPicker || inHueSlider || inOpacitySlider) || sliderValueHeld == value && value.lastChosenSlider != null) {
                                     if (inColorPicker && sliderType == null || sliderType == ColorValue.SliderType.COLOR) {
-                                        val newS =
-                                            ((mouseX - colorPickerStartX) / colorPickerWidth.toFloat()).coerceIn(
-                                                0f,
-                                                1f
-                                            )
+                                        val newS = ((mouseX - colorPickerStartX) / colorPickerWidth.toFloat()).coerceIn(
+                                            0f, 1f
+                                        )
                                         val newB =
                                             (1.0f - (mouseY - colorPickerStartY) / colorPickerHeight.toFloat()).coerceIn(
-                                                0f,
-                                                1f
+                                                0f, 1f
                                             )
                                         value.colorPickerPos.x = newS
                                         value.colorPickerPos.y = 1 - newB
@@ -617,24 +590,19 @@ object NullStyle : Style() {
 
                                     var finalColor = Color(
                                         Color.HSBtoRGB(
-                                            value.hueSliderY,
-                                            value.colorPickerPos.x,
-                                            1 - value.colorPickerPos.y
+                                            value.hueSliderY, value.colorPickerPos.x, 1 - value.colorPickerPos.y
                                         )
                                     )
 
                                     if (inHueSlider && sliderType == null || sliderType == ColorValue.SliderType.HUE) {
                                         value.hueSliderY =
                                             ((mouseY - hueSliderStartY) / hueSliderHeight.toFloat()).coerceIn(
-                                                0f,
-                                                1f
+                                                0f, 1f
                                             )
 
                                         finalColor = Color(
                                             Color.HSBtoRGB(
-                                                value.hueSliderY,
-                                                value.colorPickerPos.x,
-                                                1 - value.colorPickerPos.y
+                                                value.hueSliderY, value.colorPickerPos.x, 1 - value.colorPickerPos.y
                                             )
                                         )
                                     }
@@ -642,13 +610,11 @@ object NullStyle : Style() {
                                     if (inOpacitySlider && sliderType == null || sliderType == ColorValue.SliderType.OPACITY) {
                                         value.opacitySliderY =
                                             1 - ((mouseY - hueSliderStartY) / hueSliderHeight.toFloat()).coerceIn(
-                                                0f,
-                                                1f
+                                                0f, 1f
                                             )
                                     }
 
-                                    finalColor =
-                                        finalColor.withAlpha((value.opacitySliderY * 255).roundToInt())
+                                    finalColor = finalColor.withAlpha((value.opacitySliderY * 255).roundToInt())
 
                                     sliderValueHeld = value
 

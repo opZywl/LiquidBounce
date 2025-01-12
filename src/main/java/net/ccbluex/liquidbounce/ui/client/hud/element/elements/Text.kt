@@ -154,6 +154,9 @@ class Text(x: Double = 10.0, y: Double = 10.0, scale: Float = 1F, side: Side = S
     private val gradientX by float("Gradient-X", -500F, -2000F..2000F) { isColorModeUsed("Gradient") }
     private val gradientY by float("Gradient-Y", -1500F, -2000F..2000F) { isColorModeUsed("Gradient") }
 
+    private val colorvalue = ColorValue("SuperWow", Color.CYAN)
+    private val colorval = ColorValue("SuperWowTestLong", Color.WHITE)
+
     private var shadow by boolean("Shadow", true)
     private val font by font("Font", Fonts.font40)
 
