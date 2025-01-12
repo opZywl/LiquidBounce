@@ -82,10 +82,10 @@ object ChestStealer : Module("ChestStealer", Category.WORLD, hideModule = false)
     val silentGUI by boolean("SilentGUI", false, subjective = true)
 
     val highlightSlot by boolean("Highlight-Slot", false, subjective = true) { !silentGUI }
-    val backgroundColor by color("BackgroundColor", Color(128, 128, 128), subjective = true) { highlightSlot && !silentGUI }
+    val backgroundColor = color("BackgroundColor", Color(128, 128, 128), subjective = true) { highlightSlot && !silentGUI }
 
     val borderStrength by int("Border-Strength", 3, 1..5, subjective = true) { highlightSlot && !silentGUI }
-    val borderColor by color("BorderColor", Color(128, 128, 128), subjective = true) { highlightSlot && !silentGUI }
+    val borderColor = color("BorderColor", Color(128, 128, 128), subjective = true) { highlightSlot && !silentGUI }
 
     private val chestDebug by choices("Chest-Debug", arrayOf("Off", "Text", "Notification"), "Off", subjective = true)
     private val itemStolenDebug by boolean("ItemStolen-Debug", false, subjective = true) { chestDebug != "Off" }
