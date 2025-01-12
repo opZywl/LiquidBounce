@@ -3,7 +3,6 @@
  * A free open source mixin-based injection hacked client for Minecraft using Minecraft Forge.
  * https://github.com/CCBlueX/LiquidBounce/
  */
-
 package net.ccbluex.liquidbounce.features.module.modules.render
 
 import net.ccbluex.liquidbounce.config.choices
@@ -23,7 +22,7 @@ import org.lwjgl.opengl.GL11.*
 import java.awt.Color
 import javax.vecmath.Point2i
 
-object SnakeGame : Module("SnakeGame", Category.RENDER, gameDetecting = false, hideModule = false) {
+object SnakeGame : Module("SnakeGame", Category.FUN, gameDetecting = false, hideModule = false) {
 
     private var snake = mutableListOf(Point2i(0, 0))
     private var lastKey = 208
