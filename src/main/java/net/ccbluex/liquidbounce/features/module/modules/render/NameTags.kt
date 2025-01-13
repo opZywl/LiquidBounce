@@ -18,6 +18,7 @@ import net.ccbluex.liquidbounce.utils.attack.EntityUtils.isSelected
 import net.ccbluex.liquidbounce.utils.client.EntityLookup
 import net.ccbluex.liquidbounce.utils.extensions.*
 import net.ccbluex.liquidbounce.utils.render.ColorUtils
+import net.ccbluex.liquidbounce.utils.render.ColorUtils.withAlpha
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.disableGlCap
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawTexturedModalRect
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.enableGlCap
@@ -66,16 +67,10 @@ object NameTags : Module("NameTags", Category.RENDER, hideModule = false) {
     private val fontShadow by boolean("Shadow", true)
 
     private val background by boolean("Background", true)
-    private val backgroundColorRed by int("Background-R", 0, 0..255) { background }
-    private val backgroundColorGreen by int("Background-G", 0, 0..255) { background }
-    private val backgroundColorBlue by int("Background-B", 0, 0..255) { background }
-    private val backgroundColorAlpha by int("Background-Alpha", 70, 0..255) { background }
+    private val backgroundColor by color("BackgroundColor", Color.BLACK.withAlpha(70)) { background }
 
     private val border by boolean("Border", true)
-    private val borderColorRed by int("Border-R", 0, 0..255) { border }
-    private val borderColorGreen by int("Border-G", 0, 0..255) { border }
-    private val borderColorBlue by int("Border-B", 0, 0..255) { border }
-    private val borderColorAlpha by int("Border-Alpha", 100, 0..255) { border }
+    private val borderColor by color("BorderColor", Color.BLACK.withAlpha(100)) { border }
 
     private val maxRenderDistance by object : IntegerValue("MaxRenderDistance", 100, 1..200) {
         override fun onUpdate(value: Int) {
@@ -223,13 +218,11 @@ object NameTags : Module("NameTags", Category.RENDER, hideModule = false) {
 
         val bgColor = if (background) {
             // Background
-            Color(backgroundColorRed, backgroundColorGreen, backgroundColorBlue, backgroundColorAlpha)
+            backgroundColor
         } else {
             // Transparent
             Color(0, 0, 0, 0)
         }
-
-        val borderColor = Color(borderColorRed, borderColorGreen, borderColorBlue, borderColorAlpha)
 
         if (border) quickDrawBorderedRect(
             -width - 2F,

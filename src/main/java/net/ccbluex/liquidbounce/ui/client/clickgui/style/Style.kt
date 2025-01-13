@@ -5,13 +5,16 @@
  */
 package net.ccbluex.liquidbounce.ui.client.clickgui.style
 
+import net.ccbluex.liquidbounce.config.Value
+import net.ccbluex.liquidbounce.file.FileManager.saveConfig
+import net.ccbluex.liquidbounce.file.FileManager.valuesConfig
 import net.ccbluex.liquidbounce.ui.client.clickgui.Panel
 import net.ccbluex.liquidbounce.ui.client.clickgui.elements.ButtonElement
 import net.ccbluex.liquidbounce.ui.client.clickgui.elements.ModuleElement
 import net.ccbluex.liquidbounce.utils.client.MinecraftInstance
 import net.ccbluex.liquidbounce.utils.client.asResourceLocation
 import net.ccbluex.liquidbounce.utils.client.playSound
-import net.ccbluex.liquidbounce.config.Value
+import net.ccbluex.liquidbounce.utils.timing.WaitTickUtils
 import org.lwjgl.input.Mouse
 import java.awt.Color
 import java.math.BigDecimal
@@ -50,5 +53,29 @@ abstract class Style : MinecraftInstance {
         val alpha = if (inactiveModule) color.alpha.coerceAtMost(128) else color.alpha
 
         return Color(max(r, 0), max(g, 0), max(b, 0), alpha).rgb
+    }
+
+    fun <T> Value<T>.setAndSaveValueOnButtonRelease(new: T) {
+        set(new, false)
+
+        with(WaitTickUtils) {
+            if (!hasScheduled(this)) {
+                conditionalSchedule(this, 10) {
+                    (sliderValueHeld == null).also { if (it) saveConfig(valuesConfig) }
+                }
+            }
+        }
+    }
+
+    fun withDelayedSave(f: () -> Unit) {
+        f()
+
+        with(WaitTickUtils) {
+            if (!hasScheduled(this)) {
+                conditionalSchedule(this, 10) {
+                    (sliderValueHeld == null).also { if (it) saveConfig(valuesConfig) }
+                }
+            }
+        }
     }
 }

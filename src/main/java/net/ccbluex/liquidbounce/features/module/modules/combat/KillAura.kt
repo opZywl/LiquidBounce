@@ -324,8 +324,8 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R, hideModule
     private val circleRainbow by boolean("CircleRainbow", false, subjective = true) { mark == "Circle" }
     private val colors = ColorSettingsInteger(
         this,
-        "Circle",
-        alphaApply = { mark == "Circle" }) { mark == "Circle" && !circleRainbow }.with(132, 102, 255, 100)
+        "Circle"
+    ) { mark == "Circle" && !circleRainbow }.with(132, 102, 255, 100)
     private val fillInnerCircle by boolean("FillInnerCircle", false, subjective = true) { mark == "Circle" }
     private val withHeight by boolean("WithHeight", true, subjective = true) { mark == "Circle" }
     private val animateHeight by boolean("AnimateHeight", false, subjective = true) { withHeight }
