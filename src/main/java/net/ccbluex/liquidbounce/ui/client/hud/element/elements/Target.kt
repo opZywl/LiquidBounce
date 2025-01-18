@@ -21,8 +21,8 @@ import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawRect
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawRoundedBorderRect
 import net.ccbluex.liquidbounce.utils.render.RenderUtils.drawScaledCustomSizeModalRect
 import net.ccbluex.liquidbounce.utils.render.animation.AnimationUtil
-import net.ccbluex.liquidbounce.utils.render.shader.shaders.RainbowShader
 import net.ccbluex.liquidbounce.utils.render.shader.shaders.FrostShader
+import net.ccbluex.liquidbounce.utils.render.shader.shaders.RainbowShader
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.ResourceLocation
@@ -46,7 +46,10 @@ class Target : Element() {
 
     private val backgroundMode by choices("Background-ColorMode", arrayOf("Custom", "Rainbow", "Frost"), "Custom")
     private val backgroundColor by color("Background-Color", Color.BLACK.withAlpha(150)) { backgroundMode == "Custom" }
+
     private val frostIntensity by float("Frost-Intensity", 0.3F, 0.1F..1F) { backgroundMode == "Frost" }
+    private val frostTintColor by color("Frost-TintColor", Color.WHITE.withAlpha(150)) { backgroundMode == "Frost" }
+    private val frostBlurRadius by float("Frost-BlurRadius", 2F, 0.5F..5F) { backgroundMode == "Frost" }
 
     private val borderMode by choices("Border-ColorMode", arrayOf("Custom", "Rainbow"), "Custom")
     private val borderColor by color("Border-Color", Color.BLACK) { borderMode == "Custom" }
@@ -113,7 +116,9 @@ class Target : Element() {
                     else -> {
                         ColorUtils.interpolateHealthColor(
                             target,
-                            255, 255, 0,
+                            255,
+                            255,
+                            0,
                             if (fadeMode) alphaText else textColor.alpha,
                             healthFromScoreboard,
                             absorption
@@ -128,20 +133,20 @@ class Target : Element() {
                 if (smoothMode) {
                     val targetWidth = if (shouldRender) stringWidth else if (delayCounter >= vanishDelay) 0f else width
                     width = AnimationUtil.base(width.toDouble(), targetWidth.toDouble(), animationSpeed.toDouble())
-                        .toFloat()
-                        .coerceAtLeast(0f)
+                        .toFloat().coerceAtLeast(0f)
 
                     val targetHeight = if (shouldRender) 40f else if (delayCounter >= vanishDelay) 0f else height
                     height = AnimationUtil.base(height.toDouble(), targetHeight.toDouble(), animationSpeed.toDouble())
-                        .toFloat()
-                        .coerceAtLeast(0f)
+                        .toFloat().coerceAtLeast(0f)
                 } else {
                     width = stringWidth
                     height = 40f
 
-                    val targetText = if (shouldRender) textColor.alpha else if (delayCounter >= vanishDelay) 0f else alphaText
-                    alphaText = AnimationUtil.base(alphaText.toDouble(), targetText.toDouble(), animationSpeed.toDouble())
-                        .toInt()
+                    val targetText =
+                        if (shouldRender) textColor.alpha else if (delayCounter >= vanishDelay) 0f else alphaText
+                    alphaText =
+                        AnimationUtil.base(alphaText.toDouble(), targetText.toDouble(), animationSpeed.toDouble())
+                            .toInt()
 
                     val targetBackground = if (shouldRender) {
                         backgroundColor.alpha
@@ -150,9 +155,7 @@ class Target : Element() {
                     } else alphaBackground
 
                     alphaBackground = AnimationUtil.base(
-                        alphaBackground.toDouble(),
-                        targetBackground.toDouble(),
-                        animationSpeed.toDouble()
+                        alphaBackground.toDouble(), targetBackground.toDouble(), animationSpeed.toDouble()
                     ).toInt()
 
                     val targetBorder = if (shouldRender) {
@@ -161,8 +164,9 @@ class Target : Element() {
                         0f
                     } else alphaBorder
 
-                    alphaBorder = AnimationUtil.base(alphaBorder.toDouble(), targetBorder.toDouble(), animationSpeed.toDouble())
-                        .toInt()
+                    alphaBorder =
+                        AnimationUtil.base(alphaBorder.toDouble(), targetBorder.toDouble(), animationSpeed.toDouble())
+                            .toInt()
                 }
 
                 val backgroundCustomColor = backgroundColor.withAlpha(
@@ -190,19 +194,26 @@ class Target : Element() {
 
                     when (backgroundMode) {
                         "Frost" -> {
-                            FrostShader.begin(true, frostIntensity).use {
+                            FrostShader.begin(
+                                enable = true,
+                                intensity = frostIntensity,
+                                tintColor = frostTintColor,
+                                radius = frostBlurRadius,
+                            ).use {
                                 drawRoundedBorderRect(
-                                    0F, 0F, width, height, borderStrength,
-                                    0,
-                                    borderCustomColor,
-                                    roundedRectRadius
+                                    0F, 0F, width, height, borderStrength, 0, borderCustomColor, roundedRectRadius
                                 )
                             }
                         }
+
                         else -> {
                             RainbowShader.begin(backgroundMode == "Rainbow", rainbowX, rainbowY, rainbowOffset).use {
                                 drawRoundedBorderRect(
-                                    0F, 0F, width, height, borderStrength,
+                                    0F,
+                                    0F,
+                                    width,
+                                    height,
+                                    borderStrength,
                                     if (backgroundMode == "Rainbow") 0 else backgroundCustomColor,
                                     borderCustomColor,
                                     roundedRectRadius
@@ -229,8 +240,8 @@ class Target : Element() {
                         drawRect(3f + healthBarWidth, 34F, 3f + easingHealthWidth, 36F, Color(252, 185, 65).rgb)
                     }
 
-                    val shouldRenderBody = (fadeMode && alphaText + alphaBackground + alphaBorder > 100) ||
-                            (smoothMode && width + height > 100)
+                    val shouldRenderBody =
+                        (fadeMode && alphaText + alphaBackground + alphaBorder > 100) || (smoothMode && width + height > 100)
 
                     if (shouldRenderBody) {
                         // Draw title text
@@ -248,11 +259,7 @@ class Target : Element() {
                         // Draw info
                         mc.netHandler?.getPlayerInfo(target.uniqueID)?.let {
                             bodyFont.drawString(
-                                "Ping: ${it.responseTime.coerceAtLeast(0)}",
-                                36F,
-                                24F,
-                                textCustomColor,
-                                textShadow
+                                "Ping: ${it.responseTime.coerceAtLeast(0)}", 36F, 24F, textCustomColor, textShadow
                             )
 
                             // Draw head
