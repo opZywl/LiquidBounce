@@ -1091,26 +1091,6 @@ object RenderUtils : MinecraftInstance {
         glPopAttrib()
     }
 
-    fun drawHead(
-        skin: ResourceLocation?,
-        x: Int,
-        y: Int,
-        u: Float,
-        v: Float,
-        uWidth: Int,
-        vHeight: Int,
-        width: Int,
-        height: Int,
-        tileWidth: Float,
-        tileHeight: Float
-    ) {
-        val texture: ResourceLocation = skin ?: mc.thePlayer.locationSkin
-
-        glColor4f(1F, 1F, 1F, 1F)
-        mc.textureManager.bindTexture(texture)
-        drawScaledCustomSizeModalRect(x, y, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight)
-    }
-
     fun drawImage(image: ResourceLocation?, x: Number, y: Number, width: Int, height: Int, color: Color = Color.WHITE) {
         glPushMatrix()
         glDisable(GL_DEPTH_TEST)
@@ -1439,5 +1419,40 @@ object RenderUtils : MinecraftInstance {
 
         glPopMatrix()
         glPopAttrib()
+    }
+
+    fun customRotatedObject2D(oXpos: Float, oYpos: Float, oWidth: Float, oHeight: Float, rotate: Double) {
+        translate((oXpos + oWidth / 2).toDouble(), (oYpos + oHeight / 2).toDouble(), 0.0)
+        rotate(rotate.toFloat(), 0f, 0f, 1f)
+        translate(-(oXpos + oWidth / 2).toDouble(), -(oYpos + oHeight / 2).toDouble(), 0.0)
+    }
+
+    fun setupOrientationMatrix(x: Double, y: Double, z: Double) {
+        translate(x - mc.renderManager.viewerPosX, y - mc.renderManager.viewerPosY, z - mc.renderManager.viewerPosZ)
+    }
+
+    fun setupDrawCircles(render: Runnable) {
+        val lightingEnabled = glIsEnabled(GL_LIGHTING)
+        pushMatrix()
+        enableBlend()
+        enableAlpha()
+        alphaFunc(GL_GREATER, 0f)
+        depthMask(false)
+        disableCull()
+        if (lightingEnabled) disableLighting()
+        shadeModel(GL_SMOOTH)
+
+        blendFunc(770, 1)
+        setupOrientationMatrix(0.0, 0.0, 0.0)
+        render.run()
+        blendFunc(770, 771)
+        color(1f, 1f, 1f)
+        shadeModel(GL_FLAT)
+        if (lightingEnabled) enableLighting()
+        enableCull()
+        depthMask(true)
+        alphaFunc(GL_GREATER, .1f)
+        enableAlpha()
+        popMatrix()
     }
 }
