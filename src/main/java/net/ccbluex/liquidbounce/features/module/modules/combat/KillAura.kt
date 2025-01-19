@@ -716,7 +716,7 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R) {
             for (entity in world.loadedEntityList) {
                 val distance = player.getDistanceToEntityBox(entity)
 
-                if (entity is EntityLivingBase && isEnemy(entity) && distance <= getRange(entity)) {
+                if (entity is EntityLivingBase && isSelected(entity, true) && distance <= getRange(entity)) {
                     attackEntity(entity, isLastClick)
 
                     targets += 1
@@ -760,7 +760,7 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R) {
         var bestValue: Double? = null
 
         for (entity in theWorld.loadedEntityList) {
-            if (entity !is EntityLivingBase || !isEnemy(entity) || switchMode && entity.entityId in prevTargetEntities) continue
+            if (entity !is EntityLivingBase || !isSelected(entity, true) || switchMode && entity.entityId in prevTargetEntities) continue
 
             val distance = Backtrack.runWithNearestTrackedDistance(entity) { thePlayer.getDistanceToEntityBox(entity) }
 
@@ -808,13 +808,6 @@ object KillAura : Module("KillAura", Category.COMBAT, Keyboard.KEY_R) {
             prevTargetEntities.clear()
             updateTarget()
         }
-    }
-
-    /**
-     * Check if [entity] is selected as enemy with current target options and other modules
-     */
-    private fun isEnemy(entity: Entity?): Boolean {
-        return isSelected(entity, true)
     }
 
     /**
