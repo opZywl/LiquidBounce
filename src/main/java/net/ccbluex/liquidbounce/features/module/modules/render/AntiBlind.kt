@@ -20,7 +20,6 @@ object AntiBlind : Module("AntiBlind", Category.RENDER, gameDetecting = false, h
     val bossHealth by boolean("BossHealth", true)
     private val bookPage by boolean("BookPage", true)
     val achievements by boolean("Achievements", true)
-    val scoreboard by boolean("Scoreboard", false)
 
     val onPacket = handler<PacketEvent> { event ->
         if (!bookPage) return@handler
