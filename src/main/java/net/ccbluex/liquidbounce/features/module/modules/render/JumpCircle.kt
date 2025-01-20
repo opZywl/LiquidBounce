@@ -5,12 +5,9 @@
  */
 package net.ccbluex.liquidbounce.features.module.modules.render
 
+import net.ccbluex.liquidbounce.utils.extensions.currPos
 import net.ccbluex.liquidbounce.LiquidBounce.CLIENT_NAME
-import net.ccbluex.liquidbounce.config.boolean
-import net.ccbluex.liquidbounce.config.choices
-import net.ccbluex.liquidbounce.config.color
-import net.ccbluex.liquidbounce.config.floatRange
-import net.ccbluex.liquidbounce.config.int
+import net.ccbluex.liquidbounce.event.EventState
 import net.ccbluex.liquidbounce.event.JumpEvent
 import net.ccbluex.liquidbounce.event.Render3DEvent
 import net.ccbluex.liquidbounce.event.handler
@@ -44,7 +41,7 @@ import java.awt.Color
  * @author Original by Ell1ott (Nextgen)
  * @author Modified by EclipsesDev & opZywl
  */
-object JumpCircle : Module("JumpCircle", Category.RENDER, hideModule = false) {
+object JumpCircle : Module("JumpCircle", Category.RENDER) {
     private val circleRadius by floatRange("CircleRadius", 0.15F..0.8F, 0F..3F)
     private val innerColor by color("InnerColor", Color(0, 0, 0, 50))
     private val outerColor by color("OuterColor", Color(0, 111, 255, 255))
@@ -62,7 +59,7 @@ object JumpCircle : Module("JumpCircle", Category.RENDER, hideModule = false) {
     private val supernaturalIcon = ResourceLocation("$staticLoc/circle2.png")
 
     private val animatedGroups = listOf(mutableListOf<ResourceLocation>(), mutableListOf())
-    private val circles = mutableListOf<JumpData>()
+    private val circles = ArrayDeque<JumpData>()
     private var hasJumped = false
 
     private val tessellator = Tessellator.getInstance()
@@ -118,7 +115,10 @@ object JumpCircle : Module("JumpCircle", Category.RENDER, hideModule = false) {
     }
 
     val onJump = handler<JumpEvent> {
-        hasJumped = true
+        if (it.eventState === EventState.POST) {
+            hasJumped = true
+            circles += JumpData(mc.thePlayer.currPos, runTimeTicks + if (blackHole) lifeTime else 0)
+        }
     }
 
     val onRender3D = handler<Render3DEvent> {
@@ -156,7 +156,6 @@ object JumpCircle : Module("JumpCircle", Category.RENDER, hideModule = false) {
                 } else {
                     renderSimpleCircle(it.pos, radius, progress)
                 }
-
 
                 progress >= 1F
             }

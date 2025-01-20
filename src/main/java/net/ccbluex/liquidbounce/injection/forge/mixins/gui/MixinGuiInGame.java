@@ -56,7 +56,7 @@ public abstract class MixinGuiInGame extends Gui {
 
     @Inject(method = "renderScoreboard", at = @At("HEAD"), cancellable = true)
     private void renderScoreboard(CallbackInfo callbackInfo) {
-        if (HUD.INSTANCE.handleEvents() || AntiBlind.INSTANCE.handleEvents() && AntiBlind.INSTANCE.getScoreboard())
+        if (HUD.INSTANCE.handleEvents())
             callbackInfo.cancel();
     }
 

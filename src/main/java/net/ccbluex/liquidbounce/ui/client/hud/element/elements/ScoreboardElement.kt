@@ -7,8 +7,6 @@ package net.ccbluex.liquidbounce.ui.client.hud.element.elements
 
 import net.ccbluex.liquidbounce.LiquidBounce.CLIENT_NAME
 import net.ccbluex.liquidbounce.LiquidBounce.CLIENT_WEBSITE
-import net.ccbluex.liquidbounce.config.*
-import net.ccbluex.liquidbounce.features.module.modules.render.AntiBlind
 import net.ccbluex.liquidbounce.ui.client.hud.element.Border
 import net.ccbluex.liquidbounce.ui.client.hud.element.Element
 import net.ccbluex.liquidbounce.ui.client.hud.element.ElementInfo
@@ -34,10 +32,10 @@ import java.awt.Color
  *
  * Allows to move and customize minecraft scoreboard
  */
-@ElementInfo(name = "Scoreboard", force = true)
+@ElementInfo(name = "Scoreboard")
 class ScoreboardElement(
     x: Double = 5.0, y: Double = 0.0, scale: Float = 1F, side: Side = Side(Side.Horizontal.RIGHT, Side.Vertical.MIDDLE)
-) : Element(x, y, scale, side) {
+) : Element("Scoreboard", x, y, scale, side) {
 
     private val textColor by color("TextColor", Color.WHITE)
     private val backgroundColor by color("BackgroundColor", Color.BLACK.withAlpha(95))
@@ -61,7 +59,6 @@ class ScoreboardElement(
      */
     override fun drawElement(): Border? {
         assumeNonVolatile {
-            if (AntiBlind.handleEvents() && AntiBlind.scoreboard) return null
 
             val (fontRenderer, fontHeight) = font to ((font as? GameFontRenderer)?.height ?: font.FONT_HEIGHT)
             val textColor = textColor.rgb
