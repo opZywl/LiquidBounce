@@ -52,8 +52,8 @@ object JumpCircle : Module("JumpCircle", Category.RENDER) {
     private val texture by choices("Texture", arrayOf("Supernatural", "Aurora", "Leeches", "Circle"), "Leeches") { useTexture }
     private val deepestLight by boolean("Deepest Light", true) { useTexture }
 
-    private val staticLoc = ResourceLocation("${CLIENT_NAME.lowercase()}/texture/jumpcircle/default")
-    private val animatedLoc = ResourceLocation("${CLIENT_NAME.lowercase()}/texture/jumpcircle/animated")
+    private val staticLoc = ResourceLocation("${CLIENT_NAME.lowercase()}/textures/jumpcircle/default")
+    private val animatedLoc = ResourceLocation("${CLIENT_NAME.lowercase()}/textures/jumpcircle/animated")
 
     private val circleIcon = ResourceLocation("$staticLoc/circle1.png")
     private val supernaturalIcon = ResourceLocation("$staticLoc/circle2.png")
@@ -81,7 +81,7 @@ object JumpCircle : Module("JumpCircle", Category.RENDER) {
 
             repeat(frames) { frame ->
                 animatedGroups[groupIndex].add(
-                    ResourceLocation("$animatedLoc/animation${groupIndex + 1}/circleframe_${frame + 1}.$format")
+                    ResourceLocation("$animatedLoc/circleframe_${frame + 1}.$format")
                 )
             }
         }
@@ -154,7 +154,7 @@ object JumpCircle : Module("JumpCircle", Category.RENDER) {
                         effectStrength
                     )
                 } else {
-                    renderSimpleCircle(it.pos, radius, progress)
+                    drawHueCircle(it.pos, radius, animateColor(innerColor, progress), animateColor(outerColor, progress))
                 }
 
                 progress >= 1F
