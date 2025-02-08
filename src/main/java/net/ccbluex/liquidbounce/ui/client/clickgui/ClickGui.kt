@@ -129,7 +129,7 @@ object ClickGui : GuiScreen() {
                         SettingsUtils.applyScript(settings)
 
                         chat("§6Settings applied successfully.")
-                        HUD.addNotification(Notification.informative("ClickGUI","Updated Settings"))
+                        HUD.addNotification(Notification.informative("ClickGUI", "Updated Settings"))
                         mc.playSound("random.anvil_use".asResourceLocation())
                     } catch (e: Exception) {
                         ClientUtils.LOGGER.error("Failed to load settings", e)
@@ -293,12 +293,24 @@ object ClickGui : GuiScreen() {
 
     override fun keyTyped(typedChar: Char, keyCode: Int) {
         // Close ClickGUI by using its key bind.
-        if (keyCode == ClickGUI.keyBind) {
-            if (ignoreClosing) ignoreClosing = false
-            else mc.displayGuiScreen(null)
+        if (keyCode in arrayOf(ClickGUI.keyBind, Keyboard.KEY_ESCAPE)) {
+            if (style.chosenText != null) {
+                style.chosenText = null
+                return
+            }
 
-            return
+            if (keyCode != Keyboard.KEY_ESCAPE) {
+                if (ignoreClosing) {
+                    ignoreClosing = false
+                } else {
+                    mc.displayGuiScreen(null)
+                }
+
+                return
+            }
         }
+
+        style.chosenText?.processInput(typedChar, keyCode) { style.moveRGBAIndexBy(it) }
 
         super.keyTyped(typedChar, keyCode)
     }
@@ -306,6 +318,7 @@ object ClickGui : GuiScreen() {
     override fun onGuiClosed() {
         autoScrollY = null
         saveConfig(clickGuiConfig)
+        Keyboard.enableRepeatEvents(false)
         for (panel in panels) panel.fade = 0
     }
 
